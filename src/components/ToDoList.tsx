@@ -4,15 +4,15 @@ import {Input} from './Input'
 import {useState} from 'react'
 
 export type ToDoListType = {
-    id: number
+    id: string
     name: string
     items: ToDoListItemType[]
     isDone: boolean
     isPinned: boolean
-    deleteCallback: (toDoListId: number) => void
-    addItemCallback: (toDoListId: number, itemName: string) => void
-    deleteItemCallback: (toDoListId: number, itemId: number) => void
-    updateItemCallback: (toDoListId: number, itemId: number, isItemChecked: boolean) => void
+    deleteCallback: (toDoListId: string) => void
+    addItemCallback: (toDoListId: string, itemName: string) => void
+    deleteItemCallback: (toDoListId: string, itemId: string) => void
+    updateItemCallback: (toDoListId: string, itemId: string, isItemChecked: boolean) => void
 }
 
 export const ToDoList = ({
@@ -28,12 +28,12 @@ export const ToDoList = ({
                          }: ToDoListType) => {
 
     const itemElements = items.map(item => {
-        const deleteItem = (itemId: number) => {
-            deleteItemCallback(--id, itemId)
+        const deleteItem = (toDoListId: string, itemId: string) => {
+            deleteItemCallback(id, itemId)
         }
 
-        const updateItem = (toDoListId: number, itemId: number, isItemChecked: boolean) => {
-            updateItemCallback(--id, --itemId, isItemChecked)
+        const updateItem = (toDoListId: string, itemId: string, isItemChecked: boolean) => {
+            updateItemCallback(id, itemId, isItemChecked)
         }
 
         return <ToDoListItem
@@ -63,7 +63,7 @@ export const ToDoList = ({
     const [newItemName, setNewItemName] = useState<string>('')
 
     const addNewItem = () => {
-        addItemCallback(--id, newItemName)
+        addItemCallback(id, newItemName)
     }
 
     const onInputValueChange = (newInputValue: string) => {
@@ -75,7 +75,6 @@ export const ToDoList = ({
         <ul>
             {itemElements}
         </ul>
-
         <Input inputValue={newItemName} onChangeCallback={onInputValueChange}/><Button
         name="Add new item" onClick={addNewItem}/>
         <Button name="Delete" onClick={onDeleteHandler}/>

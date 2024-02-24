@@ -1,24 +1,18 @@
 import {ChangeEvent} from 'react'
 
 export type ToDoListItemType = {
-    id: number
-    toDoListId: number
+    id: string
+    toDoListId: string
     name: string
     isDone: boolean
-    deleteCallback: (toDoListId: number, itemId: number) => void
-    updateCallback: (toDoListId: number, itemId: number, isItemChecked: boolean) => void
+    deleteCallback: (toDoListId: string, itemId: string) => void
+    updateCallback: (toDoListId: string, itemId: string, isItemChecked: boolean) => void
 }
 
 export const ToDoListItem = ({id, toDoListId, name, isDone, deleteCallback, updateCallback}: ToDoListItemType) => {
+    const onClickHandler = () => deleteCallback(toDoListId, id)
 
-    const onClickHandler = () => {
-        deleteCallback(toDoListId, id)
-    }
-
-    const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
-        console.log(event.currentTarget.checked)
-        updateCallback(toDoListId, id, event.currentTarget.checked)
-    }
+    const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => updateCallback(toDoListId, id, event.currentTarget.checked)
 
     return <li>
         List: {toDoListId} Task: {id}

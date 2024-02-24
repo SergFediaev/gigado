@@ -2,49 +2,54 @@ import React, {useState} from 'react'
 import {Button} from './components/Button'
 import {Input} from './components/Input'
 import {ToDoList, ToDoListType} from './components/ToDoList'
+import {v1} from 'uuid'
 
 type ToDoListsType = ToDoListType[]
 
 export const App = () => {
     const [toDoLists, setToDoLists] = useState<ToDoListsType>([])
 
-    const [toDoListName, setToDoListName] = useState<string>('')
-
-    const deleteToDoList = (toDoListId: number) => {
+    const deleteToDoList = (toDoListId: string) => {
         const filteredToDoLists = toDoLists.filter(toDoList => toDoList.id !== toDoListId)
 
         setToDoLists(filteredToDoLists)
     }
 
+    const deleteItem = (toDoListId: string, itemId: string) => {
+        const foundedToDoListIndex = toDoLists.findIndex(toDoList => toDoList.id === toDoListId)
 
-    const deleteItem = (toDoListId: number, itemId: number) => {
-        const filtered = toDoLists[toDoListId].items.filter((item) => item.id !== itemId)
-        toDoLists[toDoListId].items = filtered
+        toDoLists[foundedToDoListIndex].items = toDoLists[foundedToDoListIndex].items.filter((item) => item.id !== itemId)
+
         setToDoLists([...toDoLists])
     }
 
-    const updateItem = (toDoListId: number, itemId: number, isItemChecked: boolean) => {
-        toDoLists[toDoListId].items[itemId].isDone = isItemChecked
+    const updateItem = (toDoListId: string, itemId: string, isItemChecked: boolean) => {
+        const foundedToDoListIndex = toDoLists.findIndex(toDoList => toDoList.id === toDoListId)
+
+        const foundedItemIndex = toDoLists[foundedToDoListIndex].items.findIndex(item => item.id === itemId)
+
+        toDoLists[foundedToDoListIndex].items[foundedItemIndex].isDone = isItemChecked
+
         setToDoLists([...toDoLists])
     }
 
-    const addItem = (toDoListId: number, newItemName: string) => {
-        console.log('toDoListId addItem: ', toDoListId)
-        toDoLists[toDoListId].items = [...toDoLists[toDoListId].items, {
-            id: toDoLists[toDoListId].items.length++ + 1,
+    const addItem = (toDoListId: string, newItemName: string) => {
+        const foundedToDoListIndex = toDoLists.findIndex(toDoList => toDoList.id === toDoListId)
+
+        toDoLists[foundedToDoListIndex].items = [...toDoLists[foundedToDoListIndex].items, {
+            id: v1(),
             toDoListId: toDoListId,
             name: newItemName,
             isDone: false,
             deleteCallback: deleteItem,
             updateCallback: updateItem,
-
         }]
+
         setToDoLists([...toDoLists])
     }
 
-
     const addToDoList = () => setToDoLists([...toDoLists, {
-        id: toDoLists.length++ + 1,
+        id: v1(),
         name: inputValue,
         items: [],
         isDone: false,
@@ -70,7 +75,6 @@ export const App = () => {
     const [inputValue, setInputValue] = useState<string>('')
 
     const onInputChangeValueHandler = (newInputValue: string) => setInputValue(newInputValue)
-
 
     return <>
         <Input
