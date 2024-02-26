@@ -1,0 +1,55 @@
+.dashboard {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    background: center / cover no-repeat fixed coral url("https://source.unsplash.com/random/?nature,landscape");
+}
+
+.toDoLists {
+    width: 70%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 40px;
+    gap: 40px;
+}
+
+.controlPanel {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(173, 255, 47, .1);
+    width: 30%;
+    padding: 140px 40px 40px;
+    gap: 20px;
+    backdrop-filter: blur(10px);
+    color: #fff;
+    overflow-y: scroll;
+}
+
+.appTitle {
+    word-wrap: anywhere;
+}
+
+.appTitle:hover {
+    cursor: help;
+}
+
+.submenu {
+    background-color: rgba(0, 0, 0, .6);
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.submenu li {
+    list-style-position: inside;
+    list-style-type: decimal;
+}
+
+.submenu td, .submenu li {
+    padding: 5px;
+}

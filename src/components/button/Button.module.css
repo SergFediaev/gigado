@@ -1,0 +1,33 @@
+.button {
+    border: solid 3px deepskyblue;
+    background-color: deepskyblue;
+    padding: 10px;
+    border-radius: 20px;
+    color: #fff;
+}
+
+.button:hover:enabled {
+    background-color: rgba(255, 255, 255, .7);
+    border-color: deepskyblue;
+    color: #000;
+    cursor: pointer;
+}
+
+.disabledButton {
+    opacity: .5;
+}
+
+.disabledButton:hover {
+    cursor: not-allowed;
+}
+
+.importantButton {
+    background-color: orangered;
+    border-color: orangered;
+}
+
+.importantButton:hover:enabled {
+    background-color: rgba(255, 69, 0, .3);
+    border-color: orangered;
+    color: #000;
+}

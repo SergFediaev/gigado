@@ -1,4 +1,5 @@
 import {ChangeEvent} from 'react'
+import S from './ToDoListItem.module.css'
 
 export type ToDoListItemType = {
     id: string
@@ -14,10 +15,14 @@ export const ToDoListItem = ({id, toDoListId, name, isDone, deleteCallback, upda
 
     const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => updateCallback(toDoListId, id, event.currentTarget.checked)
 
-    return <li>
-        List: {toDoListId} Task: {id}
+    return <li className={S.task}>
         <button onClick={onClickHandler}>❌</button>
-        <input type="checkbox" checked={isDone} onChange={onChangeHandler}/>
-        {name}
+        <input
+            type="checkbox"
+            checked={isDone}
+            onChange={onChangeHandler}
+            className={S.taskStatus}
+        />
+        <span className={`${isDone && S.doneTask}`}>{name}</span>
     </li>
 }

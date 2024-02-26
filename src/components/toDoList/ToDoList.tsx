@@ -1,7 +1,8 @@
-import {ToDoListItem, ToDoListItemType} from './ToDoListItem'
-import {Button} from './Button'
-import {Input} from './Input'
+import {ToDoListItem, ToDoListItemType} from '../task/ToDoListItem'
+import {Button} from '../button/Button'
+import {Input} from '../input/Input'
 import {useState} from 'react'
+import S from './ToDoList.module.css'
 
 export type ToDoListType = {
     id: string
@@ -13,6 +14,7 @@ export type ToDoListType = {
     addItemCallback: (toDoListId: string, itemName: string) => void
     deleteItemCallback: (toDoListId: string, itemId: string) => void
     updateItemCallback: (toDoListId: string, itemId: string, isItemChecked: boolean) => void
+    pinCallback: (toDoListId: string, isPinned: boolean) => void
 }
 
 export const ToDoList = ({
@@ -25,6 +27,7 @@ export const ToDoList = ({
                              addItemCallback,
                              deleteItemCallback,
                              updateItemCallback,
+                             pinCallback,
                          }: ToDoListType) => {
 
     const itemElements = items.map(item => {
@@ -47,15 +50,6 @@ export const ToDoList = ({
         />
     })
 
-    const doneStyle = {
-        opacity: .5,
-    }
-
-    const undoneStyle = {
-        backgroundColor: 'yellow',
-        opacity: 1,
-    }
-
     const onDeleteHandler = () => {
         deleteCallback(id)
     }
@@ -64,19 +58,39 @@ export const ToDoList = ({
 
     const addNewItem = () => {
         addItemCallback(id, newItemName)
+        setNewItemName('')
     }
 
     const onInputValueChange = (newInputValue: string) => {
         setNewItemName(newInputValue)
     }
+    console.log('inside todolist is pinned: ', isPinned)
 
-    return <div style={isDone ? doneStyle : undoneStyle}>
-        <h2>№ {id} {name} {isPinned && '📌'}</h2>
-        <ul>
-            {itemElements}
-        </ul>
-        <Input inputValue={newItemName} onChangeCallback={onInputValueChange}/><Button
-        name="Add new item" onClick={addNewItem}/>
-        <Button name="Delete" onClick={onDeleteHandler}/>
+    return <div className={`${S.toDoList} ${isDone ? S.completedToDoList : isPinned ? S.pinnedToDoList : undefined}`}>
+        <h2>{isPinned && '📌 '}{isDone && '✅ '}<span className={`${isDone && S.completedToDoListName}`}>{name}</span>
+        </h2>
+        <p className={S.listId}>List ID: {id}</p>
+        <ol className={S.tasks}>
+            {itemElements.length > 0 ? itemElements :
+                <span>The task list is empty for now. Added tasks will be displayed here.</span>}
+        </ol>
+        <Input
+            inputValue={newItemName}
+            onChangeCallback={onInputValueChange}
+            placeholder={'Enter new task'}
+        />
+        <Button
+            name="Add new task"
+            onClick={addNewItem}
+        />
+        {isDone ? undefined : <Button
+            name={isPinned ? 'Unpin list' : 'Pin list'}
+            onClick={() => pinCallback(id, !isPinned)}
+        />}
+        <Button
+            name="Delete list"
+            onClick={onDeleteHandler}
+            important
+        />
     </div>
 }

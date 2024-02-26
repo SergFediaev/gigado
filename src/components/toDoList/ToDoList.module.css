@@ -1,0 +1,40 @@
+.toDoList {
+    display: flex;
+    flex-direction: column;
+    background-color: yellow;
+    max-width: 300px;
+    padding: 20px;
+    border-radius: 20px;
+    gap: 20px;
+}
+
+.completedToDoList {
+    background-color: greenyellow;
+    opacity: .9;
+}
+
+.completedToDoListName {
+    color: #f00;
+    text-decoration: line-through;
+}
+
+.pinnedToDoList {
+    background-color: #ffce72;
+}
+
+.listId {
+    font-family: Consolas, monospace;
+    font-size: .6rem;
+    opacity: .8;
+}
+
+.tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin: 40px 0;
+}
+
+.tasks button:hover, .tasks input[type=checkbox]:hover {
+    cursor: pointer;
+}
