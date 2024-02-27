@@ -4,10 +4,14 @@ import {Input} from '../input/Input'
 import {useState} from 'react'
 import S from './ToDoList.module.css'
 
+type ToDoListItemsType = {
+    [taskId: string]: ToDoListItemType
+}
+
 export type ToDoListType = {
     id: string
     name: string
-    items: ToDoListItemType[]
+    items: ToDoListItemsType
     isDone: boolean
     isPinned: boolean
     deleteCallback: (toDoListId: string) => void
@@ -30,7 +34,7 @@ export const ToDoList = ({
                              pinCallback,
                          }: ToDoListType) => {
 
-    const itemElements = items.map(item => {
+    const itemElements = Object.values(items).map(item => {
         const deleteItem = (toDoListId: string, itemId: string) => {
             deleteItemCallback(id, itemId)
         }
