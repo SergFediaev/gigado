@@ -5,6 +5,7 @@ import {ToDoList, ToDoListType} from '../toDoList/ToDoList'
 import {v1} from 'uuid'
 import S from './Dashboard.module.css'
 import '../common.css'
+import {ToDoListItemType} from '../task/ToDoListItem'
 
 type ToDoListsType = ToDoListType[]
 
@@ -75,6 +76,61 @@ export const Dashboard = () => {
         setToDoLists([...toDoLists])
     }
 
+    const setCompleted = (listId: string, isCompleted: boolean) => {
+        const listIndex = toDoLists.findIndex(list => list.id === listId)
+
+        toDoLists[listIndex].isDone = isCompleted
+
+        toDoLists[listIndex].items.map(task => task.isDone = isCompleted)
+
+        setToDoLists([...toDoLists])
+    }
+
+    const moveList = (listId: string, moveLeft: boolean) => {
+        const listIndex = toDoLists.findIndex(list => list.id === listId)
+
+        let swapIndex
+
+        if (moveLeft) {
+            swapIndex = listIndex - 1
+        } else {
+            swapIndex = listIndex + 1
+        }
+
+        for (let iteration = 0; iteration < toDoLists.length; iteration++) {
+            if (iteration === listIndex) {
+                if (swapIndex < 0 || swapIndex === toDoLists.length) return
+
+                const swapElement = toDoLists[swapIndex]
+                toDoLists[swapIndex] = toDoLists[iteration]
+                toDoLists[iteration] = swapElement
+            }
+        }
+
+        setToDoLists([...toDoLists])
+    }
+
+    const splitList = (listId: string) => {
+        const listIndex = toDoLists.findIndex(list => list.id === listId)
+
+        const half = toDoLists[listIndex].items.length / 2
+
+        if (half < 1) return
+        console.log('Half: ', half)
+
+        const oldItems = []
+        const newItems = []
+
+        for (let iteration = 0; iteration < toDoLists[listIndex].items.length; iteration++) {
+            if (iteration < half) oldItems.push(toDoLists[listIndex].items[iteration])
+            if (iteration >= half) newItems.push(toDoLists[listIndex].items[iteration])
+        }
+
+        toDoLists[listIndex].items = oldItems
+        setToDoLists([...toDoLists])
+        addToDoList(newItems)
+    }
+
     const addItem = (toDoListId: string, newItemName: string) => {
         const foundedToDoListIndex = toDoLists.findIndex(toDoList => toDoList.id === toDoListId)
 
@@ -92,11 +148,11 @@ export const Dashboard = () => {
         setToDoLists([...toDoLists])
     }
 
-    const addToDoList = () => {
+    const addToDoList = (items?: ToDoListItemType[]) => {
         setToDoLists([...toDoLists, {
             id: v1(),
             name: inputValue ? inputValue : 'To-do list #' + toDoLists.length,
-            items: [],
+            items: items ? items : [],
             isDone: false,
             isPinned: false,
             deleteCallback: deleteToDoList,
@@ -104,6 +160,10 @@ export const Dashboard = () => {
             deleteItemCallback: deleteItem,
             updateItemCallback: updateItem,
             pinCallback: setPin,
+            isSelected: false,
+            completeListCallback: setCompleted,
+            moveListCallback: moveList,
+            splitListCallback: splitList,
         }])
 
         setInputValue('')
@@ -121,6 +181,10 @@ export const Dashboard = () => {
         deleteItemCallback={deleteItem}
         updateItemCallback={updateItem}
         pinCallback={setPin}
+        isSelected={toDoList.isSelected}
+        completeListCallback={setCompleted}
+        moveListCallback={moveList}
+        splitListCallback={splitList}
     />)
 
     const [inputValue, setInputValue] = useState<string>('')

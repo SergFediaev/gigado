@@ -3,6 +3,7 @@ import {Button} from '../button/Button'
 import {Input} from '../input/Input'
 import {useState} from 'react'
 import S from './ToDoList.module.css'
+import {ActionButton} from '../actionButton/ActionButton'
 
 export type ToDoListType = {
     id: string
@@ -15,6 +16,10 @@ export type ToDoListType = {
     deleteItemCallback: (toDoListId: string, itemId: string) => void
     updateItemCallback: (toDoListId: string, itemId: string, isItemChecked: boolean) => void
     pinCallback: (toDoListId: string, isPinned: boolean) => void
+    isSelected: boolean
+    completeListCallback: (listId: string, isComplete: boolean) => void
+    moveListCallback: (listId: string, moveLeft: boolean) => void
+    splitListCallback: (listId: string) => void
 }
 
 export const ToDoList = ({
@@ -28,6 +33,10 @@ export const ToDoList = ({
                              deleteItemCallback,
                              updateItemCallback,
                              pinCallback,
+                             isSelected,
+                             completeListCallback,
+                             moveListCallback,
+                             splitListCallback,
                          }: ToDoListType) => {
 
     const itemElements = items.map(item => {
@@ -66,9 +75,50 @@ export const ToDoList = ({
     }
     console.log('inside todolist is pinned: ', isPinned)
 
-    return <div className={`${S.toDoList} ${isDone ? S.completedToDoList : isPinned ? S.pinnedToDoList : undefined}`}>
-        <h2>{isPinned && '📌 '}{isDone && '✅ '}<span className={`${isDone && S.completedToDoListName}`}>{name}</span>
+    const [select, setSelect] = useState<boolean>(isSelected)
+
+    const onSelectHandler = () => {
+        setSelect(!select)
+    }
+
+    return <div
+        className={`${S.toDoList} ${isDone ? S.completedToDoList : isPinned ? S.pinnedToDoList : undefined} ${select && S.selected}`}>
+        <h2>{isPinned && '📍 '}{isDone && '✅ '}<span
+            className={`${isDone && S.completedToDoListName} ${S.listTitle}`}
+            onClick={onSelectHandler}>{name}</span>
         </h2>
+        {select && <div className={S.control}>
+            <ActionButton
+                name={isPinned ? 'Unpin' : 'Pin'}
+                icon={isPinned ? '📌' : '📍'}
+                onClickCallback={() => pinCallback(id, !isPinned)}
+            />
+            <ActionButton
+                name={isDone ? 'Uncomplete' : 'Complete'}
+                icon={isDone ? '❎' : '✅'}
+                onClickCallback={() => completeListCallback(id, !isDone)}
+            />
+            <ActionButton
+                name="Move left"
+                icon="⬅️"
+                onClickCallback={() => moveListCallback(id, true)}
+            />
+            <ActionButton
+                name="Move right"
+                icon="➡️"
+                onClickCallback={() => moveListCallback(id, false)}
+            />
+            {items.length > 1 && <ActionButton
+                name="Split"
+                icon="💔"
+                onClickCallback={() => splitListCallback(id)}/>}
+            <ActionButton
+                name="Delete"
+                icon="❌"
+                onClickCallback={onDeleteHandler}
+                important
+            />
+        </div>}
         <p className={S.listId}>List ID: {id}</p>
         <ol className={S.tasks}>
             {itemElements.length > 0 ? itemElements :
@@ -82,15 +132,6 @@ export const ToDoList = ({
         <Button
             name="Add new task"
             onClick={addNewItem}
-        />
-        {isDone ? undefined : <Button
-            name={isPinned ? 'Unpin list' : 'Pin list'}
-            onClick={() => pinCallback(id, !isPinned)}
-        />}
-        <Button
-            name="Delete list"
-            onClick={onDeleteHandler}
-            important
         />
     </div>
 }

@@ -6,6 +6,7 @@
     padding: 20px;
     border-radius: 20px;
     gap: 20px;
+    transition: .5s linear;
 }
 
 .completedToDoList {
@@ -20,6 +21,10 @@
 
 .pinnedToDoList {
     background-color: #ffce72;
+}
+
+.listTitle:hover {
+    cursor: pointer;
 }
 
 .listId {
@@ -37,4 +42,16 @@
 
 .tasks button:hover, .tasks input[type=checkbox]:hover {
     cursor: pointer;
+}
+
+.selected {
+    transform: scale(1.1);
+    box-shadow: 10px 10px 5px 0 rgba(0, 0, 0, .7);
+    background-color: lightgray;
+}
+
+.control {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
