@@ -6,6 +6,7 @@ import {v1} from 'uuid'
 import S from './Dashboard.module.css'
 import '../common.css'
 import {ToDoListItemType} from '../task/ToDoListItem'
+import {useAutoAnimate} from '@formkit/auto-animate/react'
 
 type ToDoListsType = ToDoListType[]
 
@@ -197,8 +198,12 @@ export const Dashboard = () => {
 
     const [showMenu, setShowMenu] = useState<boolean>(false)
 
+    const [listRef] = useAutoAnimate<HTMLUListElement>()
+
     return <div className={S.dashboard}>
-        <main className={S.toDoLists}>
+        <main
+            className={S.toDoLists}
+            ref={listRef}>
             {toDoListsElements}
         </main>
         <aside className={S.controlPanel}>

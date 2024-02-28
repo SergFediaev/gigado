@@ -81,6 +81,8 @@ export const ToDoList = ({
         setSelect(!select)
     }
 
+    const [showTooltips, setShowTooltips] = useState(false)
+
     return <div
         className={`${S.toDoList} ${isDone ? S.completedToDoList : isPinned ? S.pinnedToDoList : undefined} ${select && S.selected}`}>
         <h2>{isPinned && '📍 '}{isDone && '✅ '}<span
@@ -89,34 +91,47 @@ export const ToDoList = ({
         </h2>
         {select && <div className={S.control}>
             <ActionButton
+                name={showTooltips ? 'Hide tooltips' : 'Show tooltips'}
+                icon={showTooltips ? '🙈' : '❓'}
+                onClickCallback={() => setShowTooltips(!showTooltips)}
+                tooltips={showTooltips}
+            />
+            <ActionButton
                 name={isPinned ? 'Unpin' : 'Pin'}
                 icon={isPinned ? '📌' : '📍'}
                 onClickCallback={() => pinCallback(id, !isPinned)}
+                tooltips={showTooltips}
             />
             <ActionButton
                 name={isDone ? 'Uncomplete' : 'Complete'}
                 icon={isDone ? '❎' : '✅'}
                 onClickCallback={() => completeListCallback(id, !isDone)}
+                tooltips={showTooltips}
             />
             <ActionButton
                 name="Move left"
                 icon="⬅️"
                 onClickCallback={() => moveListCallback(id, true)}
+                tooltips={showTooltips}
             />
             <ActionButton
                 name="Move right"
                 icon="➡️"
                 onClickCallback={() => moveListCallback(id, false)}
+                tooltips={showTooltips}
             />
             {items.length > 1 && <ActionButton
                 name="Split"
                 icon="💔"
-                onClickCallback={() => splitListCallback(id)}/>}
+                onClickCallback={() => splitListCallback(id)}
+                tooltips={showTooltips}
+            />}
             <ActionButton
                 name="Delete"
                 icon="❌"
                 onClickCallback={onDeleteHandler}
                 important
+                tooltips={showTooltips}
             />
         </div>}
         <p className={S.listId}>List ID: {id}</p>

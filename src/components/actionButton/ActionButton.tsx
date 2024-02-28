@@ -1,11 +1,11 @@
 import S from './ActionButton.module.css'
-import {useState} from 'react'
 
 type ActionButtonPropsType = {
     name: string
     onClickCallback: () => void
     icon?: string
     important?: boolean
+    tooltips?: boolean
 }
 
 export const ActionButton = ({
@@ -13,14 +13,10 @@ export const ActionButton = ({
                                  onClickCallback,
                                  icon,
                                  important,
+                                 tooltips,
                              }: ActionButtonPropsType) => {
-
-    const [hover, setHover] = useState<boolean>(false)
-
     return <button
         className={`${S.button} ${important && S.important}`}
         onClick={onClickCallback}
-        onMouseOver={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-    >{icon && `${icon} `}{hover && name}</button>
+    >{icon && `${icon} `}{tooltips && name}</button>
 }
