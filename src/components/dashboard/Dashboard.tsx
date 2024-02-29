@@ -1,94 +1,87 @@
 import React, {useState} from 'react'
 import {Button} from '../button/Button'
 import {Input} from '../input/Input'
-import {ToDoList, ToDoListType} from '../toDoList/ToDoList'
+import {List, ListType} from '../toDoList/List'
 import {v1} from 'uuid'
 import S from './Dashboard.module.css'
 import '../common.css'
-import {ToDoListItemType} from '../task/ToDoListItem'
+import {TaskType} from '../task/Task'
 import {useAutoAnimate} from '@formkit/auto-animate/react'
 
-type ToDoListsType = ToDoListType[]
-
 export const Dashboard = () => {
-    const [toDoLists, setToDoLists] = useState<ToDoListsType>([])
+    const [lists, setLists] = useState<ListType[]>([])
 
-    const deleteToDoList = (toDoListId: string) => {
-        const filteredToDoLists = toDoLists.filter(toDoList => toDoList.id !== toDoListId)
+    const deleteList = (listId: string) => {
+        const filteredLists = lists.filter(list => list.id !== listId)
 
-        setToDoLists(filteredToDoLists)
+        setLists(filteredLists)
     }
 
-    const deleteItem = (toDoListId: string, itemId: string) => {
-        const foundedToDoListIndex = toDoLists.findIndex(toDoList => toDoList.id === toDoListId)
+    const deleteTask = (listId: string, taskId: string) => {
+        const index = lists.findIndex(list => list.id === listId)
 
-        toDoLists[foundedToDoListIndex].items = toDoLists[foundedToDoListIndex].items.filter((item) => item.id !== itemId)
+        lists[index].tasks = lists[index].tasks.filter((task) => task.taskId !== taskId)
 
-        setToDoLists([...toDoLists])
+        setLists([...lists])
     }
 
-    const sortCompletedToDoLists = (foundedToDoListIndex: number) => {
-        toDoLists[foundedToDoListIndex].isDone = toDoLists[foundedToDoListIndex].items.every(item => item.isDone)
+    const sortCompletedLists = (index: number) => {
+        lists[index].isDone = lists[index].tasks.every(task => task.isDone)
 
-        toDoLists.sort((a, b) => a.isDone === b.isDone ? 0 : a.isDone ? 1 : -1)
+        lists.sort((listA, listB) => listA.isDone === listB.isDone ? 0 : listA.isDone ? 1 : -1)
     }
 
-    const completedToDoLists = () => toDoLists.filter(toDoList => toDoList.isDone).length
+    const completedListsCount = () => lists.filter(list => list.isDone).length
 
-    const pinnedToDoLists = () => toDoLists.filter(toDoList => toDoList.isPinned).length
+    const pinnedListsCount = () => lists.filter(list => list.isPinned).length
 
-    const totalTasks = () => toDoLists.reduce((tasks, toDoList) => tasks += toDoList.items.length, 0)
+    const tasksCount = () => lists.reduce((count, list) => count += list.tasks.length, 0)
 
-    const completedTasks = () => toDoLists.reduce((completedTasks, toDoList) => {
-        toDoList.items.forEach(item => {
-            if (item.isDone) completedTasks++
+    const completedTasksCount = () => lists.reduce((count, list) => {
+        list.tasks.forEach(task => {
+            if (task.isDone) count++
         })
-        return completedTasks
+        return count
     }, 0)
 
-    const updateItem = (toDoListId: string, itemId: string, isItemChecked: boolean) => {
-        const foundedToDoListIndex = toDoLists.findIndex(toDoList => toDoList.id === toDoListId)
+    const updateTask = (listId: string, taskId: string, isTaskChecked: boolean) => {
+        const listIndex = lists.findIndex(list => list.id === listId)
 
-        const foundedItemIndex = toDoLists[foundedToDoListIndex].items.findIndex(item => item.id === itemId)
+        const taskIndex = lists[listIndex].tasks.findIndex(task => task.taskId === taskId)
 
-        toDoLists[foundedToDoListIndex].items[foundedItemIndex].isDone = isItemChecked
+        lists[listIndex].tasks[taskIndex].isDone = isTaskChecked
 
-        sortCompletedToDoLists(foundedToDoListIndex)
+        sortCompletedLists(listIndex)
 
-        if (toDoLists[foundedToDoListIndex].isDone) {
-            console.log('Founded list is done')
-            toDoLists[foundedToDoListIndex].isPinned = false
-            console.log('Founded list pinned: ', toDoLists[foundedToDoListIndex].isPinned)
-
+        if (lists[listIndex].isDone) {
+            lists[listIndex].isPinned = false
         }
 
-        console.log('Update Item in todolis.isDOne? ', toDoLists[foundedToDoListIndex].isDone)
-
-        setToDoLists([...toDoLists])
+        setLists([...lists])
     }
 
-    const setPin = (toDoListId: string, isPinned: boolean) => {
-        const foundedToDoListIndex = toDoLists.findIndex(toDoList => toDoList.id === toDoListId)
+    const pinList = (listId: string, isPinned: boolean) => {
+        const index = lists.findIndex(list => list.id === listId)
 
-        toDoLists[foundedToDoListIndex].isPinned = isPinned
+        lists[index].isPinned = isPinned
 
-        toDoLists.sort((a, b) => a.isPinned === b.isPinned ? 0 : a.isPinned ? -1 : 1)
+        lists.sort((listA, listB) => listA.isPinned === listB.isPinned ? 0 : listA.isPinned ? -1 : 1)
 
-        setToDoLists([...toDoLists])
+        setLists([...lists])
     }
 
-    const setCompleted = (listId: string, isCompleted: boolean) => {
-        const listIndex = toDoLists.findIndex(list => list.id === listId)
+    const completedList = (listId: string, isCompleted: boolean) => {
+        const index = lists.findIndex(list => list.id === listId)
 
-        toDoLists[listIndex].isDone = isCompleted
+        lists[index].isDone = isCompleted
 
-        toDoLists[listIndex].items.map(task => task.isDone = isCompleted)
+        lists[index].tasks.map(task => task.isDone = isCompleted)
 
-        setToDoLists([...toDoLists])
+        setLists([...lists])
     }
 
     const moveList = (listId: string, moveLeft: boolean) => {
-        const listIndex = toDoLists.findIndex(list => list.id === listId)
+        const listIndex = lists.findIndex(list => list.id === listId)
 
         let swapIndex
 
@@ -98,100 +91,98 @@ export const Dashboard = () => {
             swapIndex = listIndex + 1
         }
 
-        for (let iteration = 0; iteration < toDoLists.length; iteration++) {
+        for (let iteration = 0; iteration < lists.length; iteration++) {
             if (iteration === listIndex) {
-                if (swapIndex < 0 || swapIndex === toDoLists.length) return
+                if (swapIndex < 0 || swapIndex === lists.length) return
 
-                const swapElement = toDoLists[swapIndex]
-                toDoLists[swapIndex] = toDoLists[iteration]
-                toDoLists[iteration] = swapElement
+                const swapList = lists[swapIndex]
+                lists[swapIndex] = lists[iteration]
+                lists[iteration] = swapList
             }
         }
 
-        setToDoLists([...toDoLists])
+        setLists([...lists])
     }
 
     const splitList = (listId: string) => {
-        const listIndex = toDoLists.findIndex(list => list.id === listId)
+        const index = lists.findIndex(list => list.id === listId)
 
-        const half = toDoLists[listIndex].items.length / 2
-
+        const half = lists[index].tasks.length / 2
         if (half < 1) return
-        console.log('Half: ', half)
 
-        const oldItems = []
-        const newItems = []
+        const oldTasks = []
+        const newTasks = []
 
-        for (let iteration = 0; iteration < toDoLists[listIndex].items.length; iteration++) {
-            if (iteration < half) oldItems.push(toDoLists[listIndex].items[iteration])
-            if (iteration >= half) newItems.push(toDoLists[listIndex].items[iteration])
+        for (let iteration = 0; iteration < lists[index].tasks.length; iteration++) {
+            if (iteration < half) oldTasks.push(lists[index].tasks[iteration])
+            if (iteration >= half) newTasks.push(lists[index].tasks[iteration])
         }
 
-        toDoLists[listIndex].items = oldItems
-        setToDoLists([...toDoLists])
-        addToDoList(newItems)
+        lists[index].tasks = oldTasks
+        setLists([...lists])
+        addList(newTasks)
     }
 
-    const addItem = (toDoListId: string, newItemName: string) => {
-        const foundedToDoListIndex = toDoLists.findIndex(toDoList => toDoList.id === toDoListId)
+    const addTask = (listId: string, taskName: string) => {
+        const index = lists.findIndex(list => list.id === listId)
 
-        toDoLists[foundedToDoListIndex].items = [...toDoLists[foundedToDoListIndex].items, {
-            id: v1(),
-            toDoListId: toDoListId,
-            name: newItemName ? newItemName : 'Task.',
+        lists[index].tasks = [...lists[index].tasks, {
+            taskId: v1(),
+            listId: listId,
+            name: taskName ? taskName : 'Task.',
             isDone: false,
-            deleteCallback: deleteItem,
-            updateCallback: updateItem,
+            deleteTask: deleteTask,
+            updateTask: updateTask,
         }]
 
-        sortCompletedToDoLists(foundedToDoListIndex)
+        sortCompletedLists(index)
 
-        setToDoLists([...toDoLists])
+        setLists([...lists])
     }
 
-    const addToDoList = (items?: ToDoListItemType[]) => {
-        setToDoLists([...toDoLists, {
+    const addList = (tasks?: TaskType[]) => {
+        setLists([...lists, {
             id: v1(),
-            name: inputValue ? inputValue : 'To-do list #' + toDoLists.length,
-            items: items ? items : [],
+            name: inputListName ? inputListName : 'To-do list #' + lists.length,
+            tasks: tasks ? tasks : [],
             isDone: false,
             isPinned: false,
-            deleteCallback: deleteToDoList,
-            addItemCallback: addItem,
-            deleteItemCallback: deleteItem,
-            updateItemCallback: updateItem,
-            pinCallback: setPin,
+            deleteList: deleteList,
+            addTask: addTask,
+            deleteTask: deleteTask,
+            updateTask: updateTask,
+            pinList: pinList,
             isSelected: false,
-            completeListCallback: setCompleted,
-            moveListCallback: moveList,
-            splitListCallback: splitList,
+            completeList: completedList,
+            moveList: moveList,
+            splitList: splitList,
         }])
 
-        setInputValue('')
+        setInputListName('')
     }
 
-    const toDoListsElements = toDoLists.map(toDoList => <ToDoList
-        key={toDoList.id}
-        id={toDoList.id}
-        name={toDoList.name}
-        items={toDoList.items}
-        isDone={toDoList.isDone}
-        isPinned={toDoList.isPinned}
-        deleteCallback={deleteToDoList}
-        addItemCallback={addItem}
-        deleteItemCallback={deleteItem}
-        updateItemCallback={updateItem}
-        pinCallback={setPin}
-        isSelected={toDoList.isSelected}
-        completeListCallback={setCompleted}
-        moveListCallback={moveList}
-        splitListCallback={splitList}
+    const listsElements = lists.map(list => <List
+        key={list.id}
+        id={list.id}
+        name={list.name}
+        tasks={list.tasks}
+        isDone={list.isDone}
+        isPinned={list.isPinned}
+        deleteList={deleteList}
+        addTask={addTask}
+        deleteTask={deleteTask}
+        updateTask={updateTask}
+        pinList={pinList}
+        isSelected={list.isSelected}
+        completeList={completedList}
+        moveList={moveList}
+        splitList={splitList}
     />)
 
-    const [inputValue, setInputValue] = useState<string>('')
+    const [inputListName, setInputListName] = useState<string>('')
 
-    const onInputChangeValueHandler = (newInputValue: string) => {
-        setInputValue(newInputValue)
+    const inputListNameChangeHandler = (newListName: string) => {
+        setInputListName(newListName)
     }
 
     const [disabled, setDisabled] = useState<boolean>(false)
@@ -204,7 +195,7 @@ export const Dashboard = () => {
         <main
             className={S.toDoLists}
             ref={listRef}>
-            {toDoListsElements}
+            {listsElements}
         </main>
         <aside className={S.controlPanel}>
             <h1
@@ -212,13 +203,13 @@ export const Dashboard = () => {
                 title="Тудулия"
             >Todolia📌</h1>
             <Input
-                inputValue={inputValue}
-                onChangeCallback={onInputChangeValueHandler}
+                inputValue={inputListName}
+                onChangeCallback={inputListNameChangeHandler}
                 placeholder={'Enter new to-do list name'}
             />
             <Button
                 name="Create a new to-do list"
-                onClick={addToDoList}
+                onClick={addList}
                 disabled={disabled}
             />
             <Button
@@ -255,23 +246,23 @@ export const Dashboard = () => {
                     <tbody>
                     <tr>
                         <td>Total lists:</td>
-                        <td>{toDoLists.length}</td>
+                        <td>{lists.length}</td>
                     </tr>
                     <tr>
                         <td>Completed lists:</td>
-                        <td>{completedToDoLists()}</td>
+                        <td>{completedListsCount()}</td>
                     </tr>
                     <tr>
                         <td>Pinned lists:</td>
-                        <td>{pinnedToDoLists()}</td>
+                        <td>{pinnedListsCount()}</td>
                     </tr>
                     <tr>
                         <td>Total tasks:</td>
-                        <td>{totalTasks()}</td>
+                        <td>{tasksCount()}</td>
                     </tr>
                     <tr>
                         <td>Completed tasks:</td>
-                        <td>{completedTasks()}</td>
+                        <td>{completedTasksCount()}</td>
                     </tr>
                     </tbody>
                 </table>
