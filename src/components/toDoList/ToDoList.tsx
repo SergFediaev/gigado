@@ -5,14 +5,10 @@ import {useState} from 'react'
 import S from './ToDoList.module.css'
 import {ActionButton} from '../actionButton/ActionButton'
 
-type ToDoListItemsType = {
-    [taskId: string]: ToDoListItemType
-}
-
 export type ToDoListType = {
     id: string
     name: string
-    items: ToDoListItemsType
+    items: ToDoListItemType[]
     isDone: boolean
     isPinned: boolean
     deleteCallback: (toDoListId: string) => void
