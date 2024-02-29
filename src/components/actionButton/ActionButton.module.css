@@ -1,0 +1,22 @@
+.button {
+    background-color: darkblue;
+    padding: 8px;
+    border-radius: 20px;
+    font-size: .8rem;
+    color: #fff;
+    transition: .5s linear;
+}
+
+.button:hover {
+    background-color: rgba(255, 255, 255, .7);
+    color: #000;
+    cursor: pointer;
+}
+
+.important {
+    background-color: darkred;
+}
+
+.important:hover {
+    background-color: lightpink;
+}
