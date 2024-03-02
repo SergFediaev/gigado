@@ -2,7 +2,7 @@ import {ChangeEvent} from 'react'
 import S from './ToDoListItem.module.css'
 
 export type TaskType = {
-    taskId: string
+    id: string
     listId: string
     name: string
     isDone: boolean
@@ -10,10 +10,10 @@ export type TaskType = {
     updateTask: (listId: string, taskId: string, isTaskChecked: boolean) => void
 }
 
-export const Task = ({taskId, listId, name, isDone, deleteTask, updateTask}: TaskType) => {
-    const onClickHandler = () => deleteTask(listId, taskId)
+export const Task = ({id, listId, name, isDone, deleteTask, updateTask}: TaskType) => {
+    const onClickHandler = () => deleteTask(listId, id)
 
-    const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => updateTask(listId, taskId, event.currentTarget.checked)
+    const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => updateTask(listId, id, event.currentTarget.checked)
 
     return <li className={S.task}>
         <button onClick={onClickHandler}>❌</button>

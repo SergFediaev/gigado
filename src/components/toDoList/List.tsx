@@ -49,8 +49,8 @@ export const List = ({
         }
 
         return <Task
-            key={task.taskId}
-            taskId={task.taskId}
+            key={task.id}
+            id={task.id}
             listId={id}
             name={task.name}
             isDone={task.isDone}
