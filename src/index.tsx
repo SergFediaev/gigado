@@ -1,7 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import {Dashboard} from './components/dashboard/Dashboard'
 import reportWebVitals from './reportWebVitals'
+import {BrowserRouter} from 'react-router-dom'
+import {Dashboard} from './components/dashboard/Dashboard'
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement,
@@ -9,7 +10,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
     <React.StrictMode>
-        <Dashboard/>
+        <BrowserRouter>
+            <Dashboard/>
+        </BrowserRouter>
     </React.StrictMode>,
 )
 

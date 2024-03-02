@@ -1,12 +1,23 @@
 import React, {useEffect, useState} from 'react'
 import {Button} from '../button/Button'
 import {Input} from '../input/Input'
-import {List, ListType} from '../toDoList/List'
+import {List, ListType} from '../list/List'
 import {v1} from 'uuid'
 import S from './Dashboard.module.css'
 import '../common.css'
 import {TaskType} from '../task/Task'
 import {useAutoAnimate} from '@formkit/auto-animate/react'
+import {Navigate, Route, Routes, useNavigate} from 'react-router-dom'
+import {Error404} from '../error404/Error404'
+
+export const PATH = {
+    ROOT: '/',
+    ALL: '/*',
+    DASHBOARD: '/dashboard',
+    LIST: '/list',
+    ID: '/:id',
+    ERROR_404: '/error404',
+} as const
 
 export const Dashboard = () => {
     const [lists, setLists] = useState<ListType[]>([])
@@ -130,6 +141,15 @@ export const Dashboard = () => {
         addList(newTasks)
     }
 
+    const viewList = (listId: string) => {
+        const list = lists.find(list => list.id === listId)
+
+        if (list) {
+            setViewableListId(list.id)
+            navigate(`${PATH.DASHBOARD}${PATH.LIST}/${list.id}`)
+        }
+    }
+
     const addTask = (listId: string, taskName: string) => {
         const newTask = {
             id: v1(),
@@ -163,6 +183,7 @@ export const Dashboard = () => {
             completeList: completeList,
             moveList: moveList,
             splitList: splitList,
+            viewList: viewList,
         }]
 
         const sortedLists = sortCompletedLists(updatedLists)
@@ -246,6 +267,7 @@ export const Dashboard = () => {
             completeList: completeList,
             moveList: moveList,
             splitList: splitList,
+            viewList: viewList,
         },
         {
             id: mockListId2,
@@ -295,6 +317,7 @@ export const Dashboard = () => {
             completeList: completeList,
             moveList: moveList,
             splitList: splitList,
+            viewList: viewList,
         },
         {
             id: mockListId3,
@@ -344,6 +367,7 @@ export const Dashboard = () => {
             completeList: completeList,
             moveList: moveList,
             splitList: splitList,
+            viewList: viewList,
         },
         {
             id: mockListId4,
@@ -401,6 +425,7 @@ export const Dashboard = () => {
             completeList: completeList,
             moveList: moveList,
             splitList: splitList,
+            viewList: viewList,
         },
         {
             id: mockListId5,
@@ -417,6 +442,7 @@ export const Dashboard = () => {
             completeList: completeList,
             moveList: moveList,
             splitList: splitList,
+            viewList: viewList,
         },
         {
             id: mockListId6,
@@ -466,6 +492,7 @@ export const Dashboard = () => {
             completeList: completeList,
             moveList: moveList,
             splitList: splitList,
+            viewList: viewList,
         },
         {
             id: mockListId7,
@@ -507,6 +534,7 @@ export const Dashboard = () => {
             completeList: completeList,
             moveList: moveList,
             splitList: splitList,
+            viewList: viewList,
         },
         {
             id: mockListId8,
@@ -548,6 +576,7 @@ export const Dashboard = () => {
             completeList: completeList,
             moveList: moveList,
             splitList: splitList,
+            viewList: viewList,
         },
     ]
 
@@ -571,6 +600,7 @@ export const Dashboard = () => {
         completeList={completeList}
         moveList={moveList}
         splitList={splitList}
+        viewList={viewList}
     />)
 
     const [inputListName, setInputListName] = useState<string>('')
@@ -585,82 +615,117 @@ export const Dashboard = () => {
 
     const [listRef] = useAutoAnimate<HTMLUListElement>()
 
-    return <div className={S.dashboard}>
-        <main
-            className={S.toDoLists}
-            ref={listRef}>
-            {listsElements}
-        </main>
-        <aside className={S.controlPanel}>
-            <h1
-                className={S.appTitle}
-                title="Тудулия"
-            >Todolia📌</h1>
-            <Input
-                inputValue={inputListName}
-                onChangeCallback={inputListNameChangeHandler}
-                placeholder={'Enter new to-do list name'}
-            />
-            <Button
-                name="Create a new to-do list"
-                onClick={addList}
-                disabled={disabled}
-            />
-            <Button
-                name={showMenu ? 'Hide statistics' : 'Show statistics'}
-                onClick={() => setShowMenu(!showMenu)}
-            />
-            <Button
-                name={'Hide menu'}
-                onClick={() => {
-                }}
-                disabled={true}
-            />
-            <Button
-                name={'Random wallpaper'}
-                onClick={() => {
-                }}
-                disabled={true}
-            />
-            <Button
-                name={'Hide lists ID'}
-                onClick={() => {
-                }}
-                disabled={true}
-            />
-            <Button
-                name={'Delete all lists'}
-                onClick={() => {
-                }}
-                disabled={true}
-                important={true}
-            />
-            {showMenu && <div className={S.submenu}>
-                <table>
-                    <tbody>
-                    <tr>
-                        <td>Total lists:</td>
-                        <td>{lists.length}</td>
-                    </tr>
-                    <tr>
-                        <td>Completed lists:</td>
-                        <td>{completedListsCount()}</td>
-                    </tr>
-                    <tr>
-                        <td>Pinned lists:</td>
-                        <td>{pinnedListsCount()}</td>
-                    </tr>
-                    <tr>
-                        <td>Total tasks:</td>
-                        <td>{tasksCount()}</td>
-                    </tr>
-                    <tr>
-                        <td>Completed tasks:</td>
-                        <td>{completedTasksCount()}</td>
-                    </tr>
-                    </tbody>
-                </table>
+    const navigate = useNavigate()
+
+    const [viewableListId, setViewableListId] = useState<string>('')
+
+    const viewableList = lists.find(list => list.id === viewableListId)
+
+    return <Routes>
+        <Route path={PATH.DASHBOARD} element={
+            <div className={S.dashboard}>
+                <main
+                    className={S.toDoLists}
+                    ref={listRef}>
+                    {listsElements}
+                </main>
+                <aside className={S.controlPanel}>
+                    <h1
+                        className={S.appTitle}
+                        title="Тудулия"
+                    >Todolia📌</h1>
+                    <Input
+                        inputValue={inputListName}
+                        onChangeCallback={inputListNameChangeHandler}
+                        placeholder={'Enter new to-do list name'}
+                    />
+                    <Button
+                        name="Create a new to-do list"
+                        onClick={addList}
+                        disabled={disabled}
+                    />
+                    <Button
+                        name={showMenu ? 'Hide statistics' : 'Show statistics'}
+                        onClick={() => setShowMenu(!showMenu)}
+                    />
+                    <Button
+                        name={'Hide menu'}
+                        onClick={() => {
+                        }}
+                        disabled={true}
+                    />
+                    <Button
+                        name={'Random wallpaper'}
+                        onClick={() => {
+                        }}
+                        disabled={true}
+                    />
+                    <Button
+                        name={'Hide lists ID'}
+                        onClick={() => {
+                        }}
+                        disabled={true}
+                    />
+                    <Button
+                        name={'Delete all lists'}
+                        onClick={() => {
+                        }}
+                        disabled={true}
+                        important={true}
+                    />
+                    {showMenu && <div className={S.submenu}>
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td>Total lists:</td>
+                                <td>{lists.length}</td>
+                            </tr>
+                            <tr>
+                                <td>Completed lists:</td>
+                                <td>{completedListsCount()}</td>
+                            </tr>
+                            <tr>
+                                <td>Pinned lists:</td>
+                                <td>{pinnedListsCount()}</td>
+                            </tr>
+                            <tr>
+                                <td>Total tasks:</td>
+                                <td>{tasksCount()}</td>
+                            </tr>
+                            <tr>
+                                <td>Completed tasks:</td>
+                                <td>{completedTasksCount()}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>}
+                </aside>
             </div>}
-        </aside>
-    </div>
+        />
+        <Route path={`${PATH.DASHBOARD}${PATH.LIST}${PATH.ID}`} element={
+            viewableList ? <div className={S.listDetails}>
+                <Button name={'Back to dashboard 📊'} onClick={() => navigate(PATH.DASHBOARD)}/>
+                <List
+                    id={viewableList.id}
+                    name={viewableList.name}
+                    tasks={viewableList.tasks}
+                    isDone={viewableList.isDone}
+                    isPinned={viewableList.isPinned}
+                    deleteList={deleteList}
+                    addTask={addTask}
+                    deleteTask={deleteTask}
+                    updateTask={updateTask}
+                    pinList={pinList}
+                    isSelected={viewableList.isSelected}
+                    completeList={completeList}
+                    moveList={moveList}
+                    splitList={splitList}
+                    viewList={viewList}
+                />
+            </div> : <Error404/>
+        }/>
+        <Route path={PATH.ROOT} element={<Navigate to={PATH.DASHBOARD}/>}/>
+        <Route path={PATH.ERROR_404} element={<Error404/>}/>
+        <Route path={PATH.ALL} element={<Error404/>}/>
+    </Routes>
 }

@@ -1,0 +1,50 @@
+.error {
+    background-color: antiquewhite;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.overlay {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    bottom: 0;
+    background: center / contain url("../../assets/images/error404.gif") no-repeat;
+    padding: 40px;
+}
+
+.marquee {
+    --gap: 10rem;
+    display: flex;
+    gap: var(--gap);
+    transform: rotate(-20deg);
+}
+
+.marquee__list {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-around;
+    min-width: 100%;
+    gap: var(--gap);
+    animation: marquee-left 30s linear infinite;
+}
+
+.marquee__list li {
+    font-size: 10rem;
+    font-weight: 900;
+    color: #f00;
+}
+
+@keyframes marquee-left {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(calc(-100% - var(--gap)));
+    }
+}

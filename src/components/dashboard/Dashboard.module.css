@@ -53,3 +53,14 @@
 .submenu td, .submenu li {
     padding: 5px;
 }
+
+.listDetails {
+    background-color: antiquewhite;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+}
