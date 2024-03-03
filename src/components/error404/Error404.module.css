@@ -13,7 +13,7 @@
     height: 100vh;
     position: fixed;
     bottom: 0;
-    background: center / contain url("../../assets/images/error404.gif") no-repeat;
+    background: bottom center / contain url("../../assets/images/error404.gif") no-repeat;
     padding: 40px;
 }
 

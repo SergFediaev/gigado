@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import reportWebVitals from './reportWebVitals'
-import {BrowserRouter} from 'react-router-dom'
+import {HashRouter} from 'react-router-dom'
 import {Dashboard} from './components/dashboard/Dashboard'
 
 const root = ReactDOM.createRoot(
@@ -10,9 +10,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
     <React.StrictMode>
-        <BrowserRouter>
+        <HashRouter>
             <Dashboard/>
-        </BrowserRouter>
+        </HashRouter>
     </React.StrictMode>,
 )
 
