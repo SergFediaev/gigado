@@ -10,6 +10,7 @@
 .form input {
     min-width: 0;
     outline: none;
+    flex-grow: 1;
 }
 
 .form button {

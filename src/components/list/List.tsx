@@ -3,6 +3,7 @@ import React, {MouseEvent, useState} from 'react'
 import S from './ToDoList.module.css'
 import {ActionButton} from '../actionButton/ActionButton'
 import {InputForm} from '../inputForm/InputForm'
+import {useAutoAnimate} from '@formkit/auto-animate/react'
 
 export type ListType = {
     id: string
@@ -44,7 +45,8 @@ export const List = ({
                          viewList,
                      }: ListType) => {
 
-    const tasksElements = Object.values(tasks).map(task => {
+    const tasksElements = tasks.map(task => {
+
         const deleteTaskHandler = (listId: string, taskId: string) => {
             deleteTask(id, taskId)
         }
@@ -103,6 +105,8 @@ export const List = ({
         if (name !== listNameInput) changeListName(id, listNameInput)
     }
 
+    const [taskRef] = useAutoAnimate<HTMLOListElement>()
+
     return <div
         className={`${S.toDoList} ${isDone ? S.completedToDoList : isPinned ? S.pinnedToDoList : undefined} ${isListSelected && S.selected}`}>
         <h2>{isPinned && '📍 '}{isDone && '✅ '}{listNameEditing ? <textarea
@@ -148,7 +152,7 @@ export const List = ({
             />
             {tasks.length > 1 && <ActionButton
                 name="Split"
-                icon="💔"
+                icon="🔪"
                 onClickCallback={() => splitList(id)}
                 tooltips={showTooltips}
             />}
@@ -160,16 +164,18 @@ export const List = ({
             />
             <ActionButton
                 name="Delete"
-                icon="❌"
+                icon="🗑️"
                 onClickCallback={deleteListHandler}
                 important
                 tooltips={showTooltips}
             />
         </div>}
         <p className={S.listId}>List ID: {id}</p>
-        <ol className={S.tasks}>
-            {tasksElements.length > 0 ? tasksElements :
-                <span>The task list is empty for now. Added tasks will be displayed here.</span>}
+        <ol
+            ref={taskRef}
+            className={S.tasks}
+        >{tasksElements.length > 0 ? tasksElements :
+            <span>The task list is empty for now. Added tasks will be displayed here.</span>}
         </ol>
         <InputForm
             inputValue={inputTaskName}

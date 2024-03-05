@@ -22,6 +22,6 @@ export const InputForm = ({
     />
     <button
         type="submit"
-        onClick={onClick}
+        onClick={() => onClick()}
     >{buttonIcon}</button>
 </form>

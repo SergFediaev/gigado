@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react'
 import {Button} from '../button/Button'
-import {Input} from '../input/Input'
 import {List, ListType} from '../list/List'
 import {v1} from 'uuid'
 import S from './Dashboard.module.css'
@@ -9,6 +8,7 @@ import {TaskType} from '../task/Task'
 import {useAutoAnimate} from '@formkit/auto-animate/react'
 import {Navigate, Route, Routes, useNavigate} from 'react-router-dom'
 import {Error404} from '../error404/Error404'
+import {InputForm} from '../inputForm/InputForm'
 
 export const PATH = {
     ROOT: '/',
@@ -19,8 +19,28 @@ export const PATH = {
     ERROR_404: '/error404',
 } as const
 
+const KEYS = {
+    LISTS: 'lists',
+} as const
+
+const CONSTANTS = {
+    RANDOM_BACKGROUND_IMAGE_URL: 'https://source.unsplash.com/random/?nature,landscape',
+} as const
+
 export const Dashboard = () => {
-    const [lists, setLists] = useState<ListType[]>([])
+
+    const loadListsFromLocalStorage = (): ListType[] => {
+        const listsFromLocalStorage = localStorage.getItem(KEYS.LISTS)
+        return listsFromLocalStorage ? JSON.parse(listsFromLocalStorage) : Array<ListType>()
+    }
+
+    const saveListsToLocalStorage = (lists: ListType[]) => localStorage.setItem(KEYS.LISTS, JSON.stringify(lists))
+
+    const [lists, setLists] = useState<ListType[]>(loadListsFromLocalStorage)
+
+    useEffect(() => {
+        saveListsToLocalStorage(lists)
+    }, [lists])
 
     const deleteList = (listId: string) => setLists(lists.filter(list => list.id !== listId))
 
@@ -670,10 +690,6 @@ export const Dashboard = () => {
         },
     ]
 
-    useEffect(() => {
-        setLists(mockLists)
-    }, [])
-
     const listsElements = lists.map(list => <List
         key={list.id}
         id={list.id}
@@ -703,9 +719,9 @@ export const Dashboard = () => {
 
     const [disabled, setDisabled] = useState<boolean>(false)
 
-    const [showMenu, setShowMenu] = useState<boolean>(false)
+    const [showMenu, setShowMenu] = useState<boolean>(true)
 
-    const [listRef] = useAutoAnimate<HTMLUListElement>()
+    const [listRef] = useAutoAnimate<HTMLElement>()
 
     const navigate = useNavigate()
 
@@ -713,7 +729,18 @@ export const Dashboard = () => {
 
     const viewableList = lists.find(list => list.id === viewableListId)
 
-    return <div className={S.dashboard}>
+    const deleteAllLists = () => setLists([])
+
+    const [backgroundImage, setBackgroundImage] = useState<string>(CONSTANTS.RANDOM_BACKGROUND_IMAGE_URL)
+
+    const setBackgroundImageHandler = () => setBackgroundImage(CONSTANTS.RANDOM_BACKGROUND_IMAGE_URL)
+
+    const addMockedListsHandler = () => setLists([...mockLists, ...lists])
+
+    return <div
+        className={S.dashboard}
+        style={{backgroundImage: `url(${backgroundImage})`}}
+    >
         <Routes>
             <Route path={PATH.DASHBOARD} element={
                 <div>
@@ -727,10 +754,12 @@ export const Dashboard = () => {
                             className={S.appTitle}
                             title="Тудулия"
                         >Todolia📌</h1>
-                        <Input
+                        <InputForm
+                            buttonIcon="➕"
                             inputValue={inputListName}
-                            onChangeCallback={inputListNameChangeHandler}
-                            placeholder={'Enter new to-do list name'}
+                            onClick={addList}
+                            onChange={inputListNameChangeHandler}
+                            placeholder="Enter new to-do list name"
                         />
                         <Button
                             name="Create a new to-do list"
@@ -742,28 +771,30 @@ export const Dashboard = () => {
                             onClick={() => setShowMenu(!showMenu)}
                         />
                         <Button
-                            name={'Hide menu'}
+                            name="Hide menu"
                             onClick={() => {
                             }}
                             disabled={true}
                         />
                         <Button
-                            name={'Random wallpaper'}
+                            name="Random wallpaper"
+                            onClick={setBackgroundImageHandler}
+                            disabled={true}
+                        />
+                        <Button
+                            name="Hide lists ID"
                             onClick={() => {
                             }}
                             disabled={true}
                         />
                         <Button
-                            name={'Hide lists ID'}
-                            onClick={() => {
-                            }}
-                            disabled={true}
+                            name="Add mocked lists"
+                            onClick={addMockedListsHandler}
                         />
                         <Button
-                            name={'Delete all lists'}
-                            onClick={() => {
-                            }}
-                            disabled={true}
+                            name="Delete all lists"
+                            onClick={deleteAllLists}
+                            disabled={lists.length === 0}
                             important={true}
                         />
                         {showMenu && <div className={S.submenu}>
@@ -795,6 +826,8 @@ export const Dashboard = () => {
                     </aside>
                 </div>}
             />
+            <Route path={PATH.ROOT} element={<Navigate to={PATH.DASHBOARD}/>}/>
+            <Route path={PATH.ERROR_404} element={<Error404/>}/>
             <Route path={`${PATH.DASHBOARD}${PATH.LIST}${PATH.ID}`} element={
                 viewableList ? <div className={S.listDetails}>
                     <Button name={'Back to dashboard 📊'} onClick={() => navigate(PATH.DASHBOARD)}/>
@@ -819,8 +852,7 @@ export const Dashboard = () => {
                     />
                 </div> : <Error404/>
             }/>
-            <Route path={PATH.ROOT} element={<Navigate to={PATH.DASHBOARD}/>}/>
-            <Route path={PATH.ERROR_404} element={<Error404/>}/>
+            <Route path={`${PATH.DASHBOARD}${PATH.LIST}${PATH.ALL}`} element={<Error404/>}/>
             <Route path={PATH.ALL} element={<Error404/>}/>
         </Routes>
     </div>
