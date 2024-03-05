@@ -65,6 +65,13 @@ export const Dashboard = () => {
         setLists([...sortedLists])
     }
 
+    const changeTaskName = (listId: string, taskId: string, newTaskName: string) => setLists(
+        lists.map(list => list.id === listId ? {
+            ...list,
+            tasks: list.tasks.map(task => task.id === taskId ? {...task, name: newTaskName} : task),
+        } : list),
+    )
+
     const isListCompleted = (list: ListType): boolean => list.tasks.every(task => task.isDone)
 
     const pinList = (listId: string, isPinned: boolean) => {
@@ -156,8 +163,10 @@ export const Dashboard = () => {
             listId: listId,
             name: taskName ? taskName : 'Task.',
             isDone: false,
+            isSelected: false,
             deleteTask: deleteTask,
             updateTask: updateTask,
+            changeTaskName: changeTaskName,
         }
 
         setLists(lists.map(list => list.id === listId ? {
@@ -167,10 +176,16 @@ export const Dashboard = () => {
         } : list))
     }
 
+    const changeListName = (listId: string, newListName: string) => setLists(lists.map(list => list.id === listId ? {
+        ...list,
+        name: newListName,
+    } : list))
+
     const addList = (tasks?: TaskType[]) => {
-        const updatedLists = [...lists, {
+        const updatedLists = [{
             id: v1(),
             name: inputListName ? inputListName : 'To-do list #' + lists.length,
+            changeListName: changeListName,
             tasks: tasks || [],
             isDone: false,
             isPinned: false,
@@ -178,15 +193,16 @@ export const Dashboard = () => {
             addTask: addTask,
             deleteTask: deleteTask,
             updateTask: updateTask,
+            changeTaskName: changeTaskName,
             pinList: pinList,
             isSelected: false,
             completeList: completeList,
             moveList: moveList,
             splitList: splitList,
             viewList: viewList,
-        }]
+        }, ...lists]
 
-        const sortedLists = sortCompletedLists(updatedLists)
+        const sortedLists = sortPinnedLists(updatedLists)
 
         setLists(sortedLists)
 
@@ -212,48 +228,60 @@ export const Dashboard = () => {
                     listId: mockListId1,
                     name: 'Хлеб',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId1,
                     name: 'Хлеб',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId1,
                     name: 'Молоко',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId1,
                     name: 'Овощи',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId1,
                     name: 'Сладости',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId1,
                     name: 'Орехи',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
             ],
             isDone: false,
@@ -268,6 +296,8 @@ export const Dashboard = () => {
             moveList: moveList,
             splitList: splitList,
             viewList: viewList,
+            changeListName: changeListName,
+            changeTaskName: changeTaskName,
         },
         {
             id: mockListId2,
@@ -278,32 +308,40 @@ export const Dashboard = () => {
                     listId: mockListId2,
                     name: 'HTML',
                     isDone: true,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId2,
                     name: 'CSS',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId2,
                     name: 'Native',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId2,
                     name: 'React',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
             ],
             isDone: false,
@@ -318,6 +356,8 @@ export const Dashboard = () => {
             moveList: moveList,
             splitList: splitList,
             viewList: viewList,
+            changeListName: changeListName,
+            changeTaskName: changeTaskName,
         },
         {
             id: mockListId3,
@@ -328,32 +368,40 @@ export const Dashboard = () => {
                     listId: mockListId3,
                     name: 'Масло',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId3,
                     name: 'Огурцы',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId3,
                     name: 'Помидоры',
                     isDone: true,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId3,
                     name: 'Яблоки',
                     isDone: true,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
             ],
             isDone: false,
@@ -368,6 +416,8 @@ export const Dashboard = () => {
             moveList: moveList,
             splitList: splitList,
             viewList: viewList,
+            changeListName: changeListName,
+            changeTaskName: changeTaskName,
         },
         {
             id: mockListId4,
@@ -378,40 +428,50 @@ export const Dashboard = () => {
                     listId: mockListId4,
                     name: 'Имутабельность',
                     isDone: true,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId4,
                     name: 'Случайный задний фон по клику кнопки',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId4,
                     name: 'Ассоциативные массивы',
                     isDone: true,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId4,
                     name: 'Удалить все листы разом',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId4,
                     name: 'Меню-гамбургер',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
             ],
             isDone: false,
@@ -426,6 +486,8 @@ export const Dashboard = () => {
             moveList: moveList,
             splitList: splitList,
             viewList: viewList,
+            changeListName: changeListName,
+            changeTaskName: changeTaskName,
         },
         {
             id: mockListId5,
@@ -437,12 +499,14 @@ export const Dashboard = () => {
             addTask: addTask,
             deleteTask: deleteTask,
             updateTask: updateTask,
+            changeTaskName: changeTaskName,
             pinList: pinList,
             isSelected: false,
             completeList: completeList,
             moveList: moveList,
             splitList: splitList,
             viewList: viewList,
+            changeListName: changeListName,
         },
         {
             id: mockListId6,
@@ -453,32 +517,40 @@ export const Dashboard = () => {
                     listId: mockListId6,
                     name: 'Маршрутизация в реакте',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId6,
                     name: 'Сравнение ссылок под капотом',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId6,
                     name: 'Многопоточность',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId6,
                     name: 'Асинхронные функции',
                     isDone: false,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
             ],
             isDone: false,
@@ -493,6 +565,8 @@ export const Dashboard = () => {
             moveList: moveList,
             splitList: splitList,
             viewList: viewList,
+            changeListName: changeListName,
+            changeTaskName: changeTaskName,
         },
         {
             id: mockListId7,
@@ -503,24 +577,30 @@ export const Dashboard = () => {
                     listId: mockListId7,
                     name: 'Выбрать обои',
                     isDone: true,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId7,
                     name: 'Разобрать старую мебель',
                     isDone: true,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId7,
                     name: 'Собрать новую кухню',
                     isDone: true,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
             ],
             isDone: true,
@@ -535,6 +615,8 @@ export const Dashboard = () => {
             moveList: moveList,
             splitList: splitList,
             viewList: viewList,
+            changeListName: changeListName,
+            changeTaskName: changeTaskName,
         },
         {
             id: mockListId8,
@@ -545,24 +627,30 @@ export const Dashboard = () => {
                     listId: mockListId8,
                     name: 'Вёрстка на Styled Components',
                     isDone: true,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId8,
                     name: 'TDD подход к разработке',
                     isDone: true,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
                 {
                     id: v1(),
                     listId: mockListId8,
                     name: 'ООП, СОЛИД и вот это вот всё',
                     isDone: true,
+                    isSelected: false,
                     deleteTask: deleteTask,
                     updateTask: updateTask,
+                    changeTaskName: changeTaskName,
                 },
             ],
             isDone: true,
@@ -577,6 +665,8 @@ export const Dashboard = () => {
             moveList: moveList,
             splitList: splitList,
             viewList: viewList,
+            changeListName: changeListName,
+            changeTaskName: changeTaskName,
         },
     ]
 
@@ -588,6 +678,7 @@ export const Dashboard = () => {
         key={list.id}
         id={list.id}
         name={list.name}
+        changeListName={changeListName}
         tasks={list.tasks}
         isDone={list.isDone}
         isPinned={list.isPinned}
@@ -595,6 +686,7 @@ export const Dashboard = () => {
         addTask={addTask}
         deleteTask={deleteTask}
         updateTask={updateTask}
+        changeTaskName={changeTaskName}
         pinList={pinList}
         isSelected={list.isSelected}
         completeList={completeList}
@@ -621,111 +713,115 @@ export const Dashboard = () => {
 
     const viewableList = lists.find(list => list.id === viewableListId)
 
-    return <Routes>
-        <Route path={PATH.DASHBOARD} element={
-            <div className={S.dashboard}>
-                <main
-                    className={S.toDoLists}
-                    ref={listRef}>
-                    {listsElements}
-                </main>
-                <aside className={S.controlPanel}>
-                    <h1
-                        className={S.appTitle}
-                        title="Тудулия"
-                    >Todolia📌</h1>
-                    <Input
-                        inputValue={inputListName}
-                        onChangeCallback={inputListNameChangeHandler}
-                        placeholder={'Enter new to-do list name'}
+    return <div className={S.dashboard}>
+        <Routes>
+            <Route path={PATH.DASHBOARD} element={
+                <div>
+                    <main
+                        className={S.toDoLists}
+                        ref={listRef}>
+                        {listsElements}
+                    </main>
+                    <aside className={S.controlPanel}>
+                        <h1
+                            className={S.appTitle}
+                            title="Тудулия"
+                        >Todolia📌</h1>
+                        <Input
+                            inputValue={inputListName}
+                            onChangeCallback={inputListNameChangeHandler}
+                            placeholder={'Enter new to-do list name'}
+                        />
+                        <Button
+                            name="Create a new to-do list"
+                            onClick={addList}
+                            disabled={disabled}
+                        />
+                        <Button
+                            name={showMenu ? 'Hide statistics' : 'Show statistics'}
+                            onClick={() => setShowMenu(!showMenu)}
+                        />
+                        <Button
+                            name={'Hide menu'}
+                            onClick={() => {
+                            }}
+                            disabled={true}
+                        />
+                        <Button
+                            name={'Random wallpaper'}
+                            onClick={() => {
+                            }}
+                            disabled={true}
+                        />
+                        <Button
+                            name={'Hide lists ID'}
+                            onClick={() => {
+                            }}
+                            disabled={true}
+                        />
+                        <Button
+                            name={'Delete all lists'}
+                            onClick={() => {
+                            }}
+                            disabled={true}
+                            important={true}
+                        />
+                        {showMenu && <div className={S.submenu}>
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <td>Total lists:</td>
+                                    <td>{lists.length}</td>
+                                </tr>
+                                <tr>
+                                    <td>Completed lists:</td>
+                                    <td>{completedListsCount()}</td>
+                                </tr>
+                                <tr>
+                                    <td>Pinned lists:</td>
+                                    <td>{pinnedListsCount()}</td>
+                                </tr>
+                                <tr>
+                                    <td>Total tasks:</td>
+                                    <td>{tasksCount()}</td>
+                                </tr>
+                                <tr>
+                                    <td>Completed tasks:</td>
+                                    <td>{completedTasksCount()}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>}
+                    </aside>
+                </div>}
+            />
+            <Route path={`${PATH.DASHBOARD}${PATH.LIST}${PATH.ID}`} element={
+                viewableList ? <div className={S.listDetails}>
+                    <Button name={'Back to dashboard 📊'} onClick={() => navigate(PATH.DASHBOARD)}/>
+                    <List
+                        id={viewableList.id}
+                        name={viewableList.name}
+                        changeListName={changeListName}
+                        tasks={viewableList.tasks}
+                        isDone={viewableList.isDone}
+                        isPinned={viewableList.isPinned}
+                        deleteList={deleteList}
+                        addTask={addTask}
+                        deleteTask={deleteTask}
+                        updateTask={updateTask}
+                        changeTaskName={changeTaskName}
+                        pinList={pinList}
+                        isSelected={viewableList.isSelected}
+                        completeList={completeList}
+                        moveList={moveList}
+                        splitList={splitList}
+                        viewList={viewList}
                     />
-                    <Button
-                        name="Create a new to-do list"
-                        onClick={addList}
-                        disabled={disabled}
-                    />
-                    <Button
-                        name={showMenu ? 'Hide statistics' : 'Show statistics'}
-                        onClick={() => setShowMenu(!showMenu)}
-                    />
-                    <Button
-                        name={'Hide menu'}
-                        onClick={() => {
-                        }}
-                        disabled={true}
-                    />
-                    <Button
-                        name={'Random wallpaper'}
-                        onClick={() => {
-                        }}
-                        disabled={true}
-                    />
-                    <Button
-                        name={'Hide lists ID'}
-                        onClick={() => {
-                        }}
-                        disabled={true}
-                    />
-                    <Button
-                        name={'Delete all lists'}
-                        onClick={() => {
-                        }}
-                        disabled={true}
-                        important={true}
-                    />
-                    {showMenu && <div className={S.submenu}>
-                        <table>
-                            <tbody>
-                            <tr>
-                                <td>Total lists:</td>
-                                <td>{lists.length}</td>
-                            </tr>
-                            <tr>
-                                <td>Completed lists:</td>
-                                <td>{completedListsCount()}</td>
-                            </tr>
-                            <tr>
-                                <td>Pinned lists:</td>
-                                <td>{pinnedListsCount()}</td>
-                            </tr>
-                            <tr>
-                                <td>Total tasks:</td>
-                                <td>{tasksCount()}</td>
-                            </tr>
-                            <tr>
-                                <td>Completed tasks:</td>
-                                <td>{completedTasksCount()}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>}
-                </aside>
-            </div>}
-        />
-        <Route path={`${PATH.DASHBOARD}${PATH.LIST}${PATH.ID}`} element={
-            viewableList ? <div className={S.listDetails}>
-                <Button name={'Back to dashboard 📊'} onClick={() => navigate(PATH.DASHBOARD)}/>
-                <List
-                    id={viewableList.id}
-                    name={viewableList.name}
-                    tasks={viewableList.tasks}
-                    isDone={viewableList.isDone}
-                    isPinned={viewableList.isPinned}
-                    deleteList={deleteList}
-                    addTask={addTask}
-                    deleteTask={deleteTask}
-                    updateTask={updateTask}
-                    pinList={pinList}
-                    isSelected={viewableList.isSelected}
-                    completeList={completeList}
-                    moveList={moveList}
-                    splitList={splitList}
-                    viewList={viewList}
-                />
-            </div> : <Error404/>
-        }/>
-        <Route path={PATH.ROOT} element={<Navigate to={PATH.DASHBOARD}/>}/>
-        <Route path={PATH.ERROR_404} element={<Error404/>}/>
-        <Route path={PATH.ALL} element={<Error404/>}/>
-    </Routes>
+                </div> : <Error404/>
+            }/>
+            <Route path={PATH.ROOT} element={<Navigate to={PATH.DASHBOARD}/>}/>
+            <Route path={PATH.ERROR_404} element={<Error404/>}/>
+            <Route path={PATH.ALL} element={<Error404/>}/>
+        </Routes>
+    </div>
 }

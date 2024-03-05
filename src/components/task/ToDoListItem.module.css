@@ -1,16 +1,49 @@
-.task {
+.taskContainer {
     display: flex;
     align-items: baseline;
     word-wrap: anywhere;
     gap: 20px;
 }
 
+.task {
+    margin-bottom: 40px;
+}
+
+.taskSelected {
+    background-color: #f0fff3;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.taskName {
+    cursor: pointer;
+}
+
 .taskStatus[type=checkbox] {
     transform: scale(2);
+    margin-left: 5px;
 }
 
 .doneTask {
     opacity: .5;
     color: #f00;
     text-decoration: line-through;
+}
+
+.editable {
+    max-width: 100%;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 20px;
+    overflow: hidden;
+    resize: none;
+    outline: none;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, .5) inset;
+}
+
+.control {
+    padding: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }

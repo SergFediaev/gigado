@@ -1,0 +1,17 @@
+.form {
+    display: flex;
+    gap: 10px;
+    background-color: floralwhite;
+    padding: 15px;
+    border-radius: 20px;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, .5) inset;
+}
+
+.form input {
+    min-width: 0;
+    outline: none;
+}
+
+.form button {
+    cursor: pointer;
+}

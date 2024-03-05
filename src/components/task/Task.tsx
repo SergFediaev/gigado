@@ -1,28 +1,97 @@
-import {ChangeEvent} from 'react'
-import S from './ToDoListItem.module.css'
+import React, {ChangeEvent, MouseEvent, useState} from 'react'
+import s from './ToDoListItem.module.css'
+import {ActionButton} from '../actionButton/ActionButton'
 
 export type TaskType = {
     id: string
     listId: string
     name: string
     isDone: boolean
+    isSelected: boolean
     deleteTask: (listId: string, taskId: string) => void
     updateTask: (listId: string, taskId: string, isTaskChecked: boolean) => void
+    changeTaskName: (listId: string, id: string, newTaskName: string) => void
 }
 
-export const Task = ({id, listId, name, isDone, deleteTask, updateTask}: TaskType) => {
+export const Task = ({
+                         id,
+                         listId,
+                         name,
+                         changeTaskName,
+                         isDone,
+                         isSelected,
+                         deleteTask,
+                         updateTask,
+                     }: TaskType) => {
     const onClickHandler = () => deleteTask(listId, id)
 
     const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => updateTask(listId, id, event.currentTarget.checked)
 
-    return <li className={S.task}>
-        <button onClick={onClickHandler}>❌</button>
-        <input
-            type="checkbox"
-            checked={isDone}
-            onChange={onChangeHandler}
-            className={S.taskStatus}
-        />
-        <span className={`${isDone && S.doneTask}`}>{name}</span>
-    </li>
+    const [editing, setEditing] = useState<boolean>(false)
+
+    const [selected, setSelected] = useState<boolean>(isSelected)
+
+    const [taskNameInput, setTaskNameInput] = useState<string>(name)
+
+    const changeTaskNameHandler = () => {
+        if (name !== taskNameInput) changeTaskName(listId, id, taskNameInput)
+        setEditing(false)
+    }
+
+    const onTaskNameClickHandler = (event: MouseEvent<HTMLSpanElement>) => {
+        if (event.ctrlKey) setEditing(true)
+        else setSelected(!selected)
+    }
+
+    const [showTooltips, setShowTooltips] = useState(false)
+
+    return <>
+        <li className={`${s.task} ${selected && s.taskSelected}`}>
+            <div className={s.taskContainer}>
+                {editing ? <textarea
+                    className={s.editable}
+                    value={taskNameInput}
+                    onChange={(event) => setTaskNameInput(event.currentTarget.value)}
+                    onBlur={changeTaskNameHandler}
+                /> : <>
+                    <input
+                        type="checkbox"
+                        checked={isDone}
+                        onChange={onChangeHandler}
+                        className={s.taskStatus}
+                    />
+                    <span
+                        className={`${s.taskName} ${isDone && s.doneTask}`}
+                        onClick={onTaskNameClickHandler}
+                    >{name}</span>
+                </>}
+            </div>
+            {selected && <div className={s.control}>
+                <ActionButton
+                    name={showTooltips ? 'Hide tooltips' : 'Show tooltips'}
+                    icon={showTooltips ? '🙈' : '❓'}
+                    onClickCallback={() => setShowTooltips(!showTooltips)}
+                    tooltips={showTooltips}
+                />
+                <ActionButton
+                    name="Delete"
+                    icon="🗑️"
+                    onClickCallback={onClickHandler}
+                    tooltips={showTooltips}
+                />
+                <ActionButton
+                    name="Move up"
+                    icon="⬆️"
+                    onClickCallback={onClickHandler}
+                    tooltips={showTooltips}
+                />
+                <ActionButton
+                    name="Move down"
+                    icon="⬇️"
+                    onClickCallback={onClickHandler}
+                    tooltips={showTooltips}
+                />
+            </div>}
+        </li>
+    </>
 }

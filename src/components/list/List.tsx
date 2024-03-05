@@ -1,13 +1,13 @@
 import {Task, TaskType} from '../task/Task'
-import {Button} from '../button/Button'
-import {Input} from '../input/Input'
-import {useState} from 'react'
+import React, {MouseEvent, useState} from 'react'
 import S from './ToDoList.module.css'
 import {ActionButton} from '../actionButton/ActionButton'
+import {InputForm} from '../inputForm/InputForm'
 
 export type ListType = {
     id: string
     name: string
+    changeListName: (listId: string, newListName: string) => void
     tasks: TaskType[]
     isDone: boolean
     isPinned: boolean
@@ -15,6 +15,7 @@ export type ListType = {
     addTask: (listId: string, taskName: string) => void
     deleteTask: (listId: string, taskId: string) => void
     updateTask: (listId: string, taskId: string, isTaskChecked: boolean) => void
+    changeTaskName: (listId: string, taskId: string, newTaskName: string) => void
     pinList: (listId: string, isPinned: boolean) => void
     isSelected: boolean
     completeList: (listId: string, isComplete: boolean) => void
@@ -26,6 +27,7 @@ export type ListType = {
 export const List = ({
                          id,
                          name,
+                         changeListName,
                          tasks,
                          isDone,
                          isPinned,
@@ -33,6 +35,7 @@ export const List = ({
                          addTask,
                          deleteTask,
                          updateTask,
+                         changeTaskName,
                          pinList,
                          isSelected,
                          completeList,
@@ -50,12 +53,18 @@ export const List = ({
             updateTask(id, taskId, isTaskChecked)
         }
 
+        const changeTaskNameHandler = (listId: string, taskId: string, newTaskName: string) => {
+            changeTaskName(id, taskId, newTaskName)
+        }
+
         return <Task
             key={task.id}
             id={task.id}
             listId={id}
             name={task.name}
+            changeTaskName={changeTaskNameHandler}
             isDone={task.isDone}
+            isSelected={task.isSelected}
             deleteTask={deleteTaskHandler}
             updateTask={updateTaskHandler}
         />
@@ -78,18 +87,34 @@ export const List = ({
 
     const [isListSelected, selectList] = useState<boolean>(isSelected)
 
-    const selectListHandler = () => {
-        selectList(!isListSelected)
+    const selectListHandler = (event: MouseEvent<HTMLSpanElement>) => {
+        if (event.ctrlKey) setListNameEditing(true)
+        else selectList(!isListSelected)
     }
 
     const [showTooltips, setShowTooltips] = useState(false)
 
+    const [listNameEditing, setListNameEditing] = useState<boolean>(false)
+
+    const [listNameInput, setListNameInput] = useState<string>(name)
+
+    const changeListNameHandler = () => {
+        setListNameEditing(false)
+        if (name !== listNameInput) changeListName(id, listNameInput)
+    }
+
     return <div
         className={`${S.toDoList} ${isDone ? S.completedToDoList : isPinned ? S.pinnedToDoList : undefined} ${isListSelected && S.selected}`}>
-        <h2>{isPinned && '📍 '}{isDone && '✅ '}<span
+        <h2>{isPinned && '📍 '}{isDone && '✅ '}{listNameEditing ? <textarea
+            className={S.editable}
+            value={listNameInput}
+            onChange={(event) => setListNameInput(event.currentTarget.value)}
+            onBlur={changeListNameHandler}
+            autoFocus
+        /> : <span
             className={`${isDone && S.completedToDoListName} ${S.listTitle}`}
-            onClick={selectListHandler}>{name}</span>
-        </h2>
+            onClick={(event) => selectListHandler(event)}
+        >{name}</span>}</h2>
         {isListSelected && <div className={S.control}>
             <ActionButton
                 name={showTooltips ? 'Hide tooltips' : 'Show tooltips'}
@@ -146,13 +171,11 @@ export const List = ({
             {tasksElements.length > 0 ? tasksElements :
                 <span>The task list is empty for now. Added tasks will be displayed here.</span>}
         </ol>
-        <Input
+        <InputForm
             inputValue={inputTaskName}
-            onChangeCallback={inputTaskNameChange}
-            placeholder={'Enter new task'}
-        />
-        <Button
-            name="Add new task"
+            placeholder="Enter new task"
+            onChange={inputTaskNameChange}
+            buttonIcon="➕"
             onClick={addTaskHandler}
         />
     </div>

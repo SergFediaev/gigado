@@ -1,7 +1,7 @@
 .toDoList {
     display: flex;
     flex-direction: column;
-    background-color: yellow;
+    background-color: #faf900;
     max-width: 300px;
     padding: 20px;
     border-radius: 20px;
@@ -23,6 +23,10 @@
     background-color: #ffce72;
 }
 
+.listTitle {
+    word-wrap: anywhere;
+}
+
 .listTitle:hover {
     cursor: pointer;
 }
@@ -36,7 +40,6 @@
 .tasks {
     display: flex;
     flex-direction: column;
-    gap: 40px;
     margin: 40px 0;
 }
 
@@ -47,11 +50,22 @@
 .selected {
     transform: scale(1.1);
     box-shadow: 10px 10px 5px 0 rgba(0, 0, 0, .7);
-    background-color: lightgray;
+    background-color: aliceblue;
 }
 
 .control {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+.editable {
+    max-width: 100%;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 20px;
+    overflow: hidden;
+    resize: none;
+    outline: none;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, .5) inset;
 }
