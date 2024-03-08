@@ -6,6 +6,7 @@ type InputFormPropsType = {
     onChange: (inputValue: string) => void
     buttonIcon: string
     onClick: () => void
+    buttonTitle?: string
 };
 
 export const InputForm = ({
@@ -14,6 +15,7 @@ export const InputForm = ({
                               onChange,
                               buttonIcon,
                               onClick,
+                              buttonTitle,
                           }: InputFormPropsType) => <form className={s.form}>
     <input
         value={inputValue}
@@ -23,5 +25,6 @@ export const InputForm = ({
     <button
         type="submit"
         onClick={() => onClick()}
+        title={buttonTitle}
     >{buttonIcon}</button>
 </form>

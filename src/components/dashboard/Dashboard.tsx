@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react'
 import {Button} from '../button/Button'
 import {List, ListType} from '../list/List'
 import {v1} from 'uuid'
-import S from './Dashboard.module.css'
+import s from './Dashboard.module.css'
 import '../common.css'
 import {TaskType} from '../task/Task'
 import {useAutoAnimate} from '@formkit/auto-animate/react'
@@ -26,6 +26,12 @@ const KEYS = {
 const CONSTANTS = {
     RANDOM_BACKGROUND_IMAGE_URL: 'https://source.unsplash.com/random/?nature,landscape',
 } as const
+
+const addNewTask = (tasks: TaskType[], index: number, task: TaskType): TaskType[] => {
+    const copy = [...tasks]
+    copy.splice(index, 0, task)
+    return copy
+}
 
 export const Dashboard = () => {
 
@@ -91,6 +97,61 @@ export const Dashboard = () => {
             tasks: list.tasks.map(task => task.id === taskId ? {...task, name: newTaskName} : task),
         } : list),
     )
+
+    const moveTaskVertical = (listId: string, taskId: string, moveDown: boolean) => {
+        const listIndex = lists.findIndex(list => list.id === listId)
+        const taskIndex = lists[listIndex].tasks.findIndex(task => task.id === taskId)
+
+        for (let iteration = 0; iteration < lists[listIndex].tasks.length; iteration++) {
+            if (iteration === taskIndex) {
+                let swapIndex
+
+                if (moveDown) {
+                    swapIndex = taskIndex + 1
+                    if (swapIndex === lists[listIndex].tasks.length) swapIndex = 0
+                } else {
+                    swapIndex = taskIndex - 1
+                    if (swapIndex < 0) swapIndex = lists[listIndex].tasks.length - 1
+                }
+
+                const swapTask = lists[listIndex].tasks[swapIndex]
+                lists[listIndex].tasks[swapIndex] = lists[listIndex].tasks[iteration]
+                lists[listIndex].tasks[iteration] = swapTask
+            }
+        }
+
+        setLists([...lists])
+    }
+
+    const moveTaskHorizontal = (listId: string, taskId: string, moveRight: boolean) => {
+        const listIndex = lists.findIndex(list => list.id === listId)
+        const taskIndex = lists[listIndex].tasks.findIndex(task => task.id === taskId)
+        const swapTask = lists[listIndex].tasks[taskIndex]
+
+        let swapIndex
+
+        if (moveRight) {
+            swapIndex = listIndex + 1
+            if (swapIndex === lists.length) swapIndex = 0
+        } else {
+            swapIndex = listIndex - 1
+            if (swapIndex < 0) swapIndex = lists.length - 1
+        }
+
+        const swapListId = lists[swapIndex].id
+
+        const listsWithRemovedTask = lists.map(list => list.id === listId ? {
+            ...list,
+            tasks: list.tasks.filter(task => task.id !== taskId),
+        } : list)
+
+        const listsWithAddedTask = listsWithRemovedTask.map(list => list.id === swapListId ? {
+            ...list,
+            tasks: list.tasks[taskIndex] ? addNewTask(list.tasks, taskIndex, swapTask) : [...list.tasks, swapTask],
+        } : list)
+
+        setLists(listsWithAddedTask)
+    }
 
     const isListCompleted = (list: ListType): boolean => list.tasks.every(task => task.isDone)
 
@@ -187,6 +248,8 @@ export const Dashboard = () => {
             deleteTask: deleteTask,
             updateTask: updateTask,
             changeTaskName: changeTaskName,
+            moveTaskVertical: moveTaskVertical,
+            moveTaskHorizontal: moveTaskHorizontal,
         }
 
         setLists(lists.map(list => list.id === listId ? {
@@ -214,6 +277,8 @@ export const Dashboard = () => {
             deleteTask: deleteTask,
             updateTask: updateTask,
             changeTaskName: changeTaskName,
+            moveTaskVertical: moveTaskVertical,
+            moveTaskHorizontal: moveTaskHorizontal,
             pinList: pinList,
             isSelected: false,
             completeList: completeList,
@@ -252,6 +317,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -262,6 +329,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -272,6 +341,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -282,6 +353,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -292,6 +365,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -302,6 +377,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
             ],
             isDone: false,
@@ -318,6 +395,8 @@ export const Dashboard = () => {
             viewList: viewList,
             changeListName: changeListName,
             changeTaskName: changeTaskName,
+            moveTaskVertical: moveTaskVertical,
+            moveTaskHorizontal: moveTaskHorizontal,
         },
         {
             id: mockListId2,
@@ -332,6 +411,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -342,6 +423,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -352,6 +435,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -362,6 +447,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
             ],
             isDone: false,
@@ -378,6 +465,8 @@ export const Dashboard = () => {
             viewList: viewList,
             changeListName: changeListName,
             changeTaskName: changeTaskName,
+            moveTaskVertical: moveTaskVertical,
+            moveTaskHorizontal: moveTaskHorizontal,
         },
         {
             id: mockListId3,
@@ -392,6 +481,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -402,6 +493,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -412,6 +505,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -422,6 +517,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
             ],
             isDone: false,
@@ -438,6 +535,8 @@ export const Dashboard = () => {
             viewList: viewList,
             changeListName: changeListName,
             changeTaskName: changeTaskName,
+            moveTaskVertical: moveTaskVertical,
+            moveTaskHorizontal: moveTaskHorizontal,
         },
         {
             id: mockListId4,
@@ -452,6 +551,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -462,6 +563,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -472,6 +575,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -482,6 +587,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -492,6 +599,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
             ],
             isDone: false,
@@ -508,6 +617,8 @@ export const Dashboard = () => {
             viewList: viewList,
             changeListName: changeListName,
             changeTaskName: changeTaskName,
+            moveTaskVertical: moveTaskVertical,
+            moveTaskHorizontal: moveTaskHorizontal,
         },
         {
             id: mockListId5,
@@ -527,6 +638,8 @@ export const Dashboard = () => {
             splitList: splitList,
             viewList: viewList,
             changeListName: changeListName,
+            moveTaskVertical: moveTaskVertical,
+            moveTaskHorizontal: moveTaskHorizontal,
         },
         {
             id: mockListId6,
@@ -541,6 +654,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -551,6 +666,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -561,6 +678,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -571,6 +690,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
             ],
             isDone: false,
@@ -587,6 +708,8 @@ export const Dashboard = () => {
             viewList: viewList,
             changeListName: changeListName,
             changeTaskName: changeTaskName,
+            moveTaskVertical: moveTaskVertical,
+            moveTaskHorizontal: moveTaskHorizontal,
         },
         {
             id: mockListId7,
@@ -601,6 +724,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -611,6 +736,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -621,6 +748,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
             ],
             isDone: true,
@@ -637,6 +766,8 @@ export const Dashboard = () => {
             viewList: viewList,
             changeListName: changeListName,
             changeTaskName: changeTaskName,
+            moveTaskVertical: moveTaskVertical,
+            moveTaskHorizontal: moveTaskHorizontal,
         },
         {
             id: mockListId8,
@@ -651,6 +782,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -661,6 +794,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
                 {
                     id: v1(),
@@ -671,6 +806,8 @@ export const Dashboard = () => {
                     deleteTask: deleteTask,
                     updateTask: updateTask,
                     changeTaskName: changeTaskName,
+                    moveTaskVertical: moveTaskVertical,
+                    moveTaskHorizontal: moveTaskHorizontal,
                 },
             ],
             isDone: true,
@@ -687,6 +824,8 @@ export const Dashboard = () => {
             viewList: viewList,
             changeListName: changeListName,
             changeTaskName: changeTaskName,
+            moveTaskVertical: moveTaskVertical,
+            moveTaskHorizontal: moveTaskHorizontal,
         },
     ]
 
@@ -709,6 +848,8 @@ export const Dashboard = () => {
         moveList={moveList}
         splitList={splitList}
         viewList={viewList}
+        moveTaskVertical={moveTaskVertical}
+        moveTaskHorizontal={moveTaskHorizontal}
     />)
 
     const [inputListName, setInputListName] = useState<string>('')
@@ -738,20 +879,23 @@ export const Dashboard = () => {
     const addMockedListsHandler = () => setLists([...mockLists, ...lists])
 
     return <div
-        className={S.dashboard}
+        className={s.dashboard}
         style={{backgroundImage: `url(${backgroundImage})`}}
     >
         <Routes>
             <Route path={PATH.DASHBOARD} element={
                 <div>
+                    {lists.length === 0 && <div className={s.onboarding}>
+                        <span>Just create your first to-do list!</span>
+                    </div>}
                     <main
-                        className={S.toDoLists}
+                        className={s.toDoLists}
                         ref={listRef}>
                         {listsElements}
                     </main>
-                    <aside className={S.controlPanel}>
+                    <aside className={s.controlPanel}>
                         <h1
-                            className={S.appTitle}
+                            className={s.appTitle}
                             title="Тудулия"
                         >Todolia📌</h1>
                         <InputForm
@@ -760,11 +904,7 @@ export const Dashboard = () => {
                             onClick={addList}
                             onChange={inputListNameChangeHandler}
                             placeholder="Enter new to-do list name"
-                        />
-                        <Button
-                            name="Create a new to-do list"
-                            onClick={addList}
-                            disabled={disabled}
+                            buttonTitle="Create a new to-do list"
                         />
                         <Button
                             name={showMenu ? 'Hide statistics' : 'Show statistics'}
@@ -797,7 +937,7 @@ export const Dashboard = () => {
                             disabled={lists.length === 0}
                             important={true}
                         />
-                        {showMenu && <div className={S.submenu}>
+                        {showMenu && <div className={s.submenu}>
                             <table>
                                 <tbody>
                                 <tr>
@@ -829,7 +969,7 @@ export const Dashboard = () => {
             <Route path={PATH.ROOT} element={<Navigate to={PATH.DASHBOARD}/>}/>
             <Route path={PATH.ERROR_404} element={<Error404/>}/>
             <Route path={`${PATH.DASHBOARD}${PATH.LIST}${PATH.ID}`} element={
-                viewableList ? <div className={S.listDetails}>
+                viewableList ? <div className={s.listDetails}>
                     <Button name={'Back to dashboard 📊'} onClick={() => navigate(PATH.DASHBOARD)}/>
                     <List
                         id={viewableList.id}
@@ -843,6 +983,8 @@ export const Dashboard = () => {
                         deleteTask={deleteTask}
                         updateTask={updateTask}
                         changeTaskName={changeTaskName}
+                        moveTaskVertical={moveTaskVertical}
+                        moveTaskHorizontal={moveTaskHorizontal}
                         pinList={pinList}
                         isSelected={viewableList.isSelected}
                         completeList={completeList}

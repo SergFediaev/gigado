@@ -5,6 +5,26 @@
     background: center / cover no-repeat fixed coral;
 }
 
+.onboarding {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: bottom center / cover url("../../assets/images/onboarding.gif") no-repeat rgba(0, 0, 0, .5);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+}
+
+.onboarding span {
+    width: 70%;
+    font-size: 2rem;
+    font-weight: 900;
+    color: #fff;
+    text-align: center;
+}
+
 .toDoLists {
     width: 70%;
     display: flex;
@@ -22,7 +42,7 @@
     top: 0;
     bottom: 0;
     right: 0;
-    background-color: rgba(173, 255, 47, .1);
+    background-color: rgba(0, 0, 0, .2);
     width: 30%;
     padding: 140px 40px 40px;
     gap: 20px;

@@ -11,6 +11,8 @@ export type TaskType = {
     deleteTask: (listId: string, taskId: string) => void
     updateTask: (listId: string, taskId: string, isTaskChecked: boolean) => void
     changeTaskName: (listId: string, id: string, newTaskName: string) => void
+    moveTaskVertical: (listId: string, taskId: string, moveDown: boolean) => void
+    moveTaskHorizontal: (listId: string, taskId: string, moveRight: boolean) => void
 }
 
 export const Task = ({
@@ -22,6 +24,8 @@ export const Task = ({
                          isSelected,
                          deleteTask,
                          updateTask,
+                         moveTaskVertical,
+                         moveTaskHorizontal,
                      }: TaskType) => {
     const onClickHandler = () => deleteTask(listId, id)
 
@@ -82,13 +86,25 @@ export const Task = ({
                 <ActionButton
                     name="Move up"
                     icon="⬆️"
-                    onClickCallback={onClickHandler}
+                    onClickCallback={() => moveTaskVertical(listId, id, false)}
                     tooltips={showTooltips}
                 />
                 <ActionButton
                     name="Move down"
                     icon="⬇️"
-                    onClickCallback={onClickHandler}
+                    onClickCallback={() => moveTaskVertical(listId, id, true)}
+                    tooltips={showTooltips}
+                />
+                <ActionButton
+                    name="Move left"
+                    icon="⬅️"
+                    onClickCallback={() => moveTaskHorizontal(listId, id, false)}
+                    tooltips={showTooltips}
+                />
+                <ActionButton
+                    name="Move right"
+                    icon="➡️"
+                    onClickCallback={() => moveTaskHorizontal(listId, id, true)}
                     tooltips={showTooltips}
                 />
             </div>}

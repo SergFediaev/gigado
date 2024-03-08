@@ -17,6 +17,8 @@ export type ListType = {
     deleteTask: (listId: string, taskId: string) => void
     updateTask: (listId: string, taskId: string, isTaskChecked: boolean) => void
     changeTaskName: (listId: string, taskId: string, newTaskName: string) => void
+    moveTaskVertical: (listId: string, taskId: string, moveDown: boolean) => void
+    moveTaskHorizontal: (listId: string, taskId: string, moveRight: boolean) => void
     pinList: (listId: string, isPinned: boolean) => void
     isSelected: boolean
     completeList: (listId: string, isComplete: boolean) => void
@@ -43,6 +45,8 @@ export const List = ({
                          moveList,
                          splitList,
                          viewList,
+                         moveTaskVertical,
+                         moveTaskHorizontal,
                      }: ListType) => {
 
     const tasksElements = tasks.map(task => {
@@ -59,6 +63,14 @@ export const List = ({
             changeTaskName(id, taskId, newTaskName)
         }
 
+        const moveTaskVerticalHandler = (listId: string, taskId: string, moveDown: boolean) => {
+            moveTaskVertical(listId, taskId, moveDown)
+        }
+
+        const moveTaskHorizontalHandler = (listId: string, taskId: string, moveRight: boolean) => {
+            moveTaskHorizontal(listId, taskId, moveRight)
+        }
+
         return <Task
             key={task.id}
             id={task.id}
@@ -69,6 +81,8 @@ export const List = ({
             isSelected={task.isSelected}
             deleteTask={deleteTaskHandler}
             updateTask={updateTaskHandler}
+            moveTaskVertical={moveTaskVerticalHandler}
+            moveTaskHorizontal={moveTaskHorizontalHandler}
         />
     })
 
