@@ -9,6 +9,7 @@ import {useAutoAnimate} from '@formkit/auto-animate/react'
 import {Navigate, Route, Routes, useNavigate} from 'react-router-dom'
 import {Error404} from '../error404/Error404'
 import {InputForm} from '../inputForm/InputForm'
+import {Counter, CounterType} from '../Counter/Counter'
 
 export const PATH = {
     ROOT: '/',
@@ -33,16 +34,20 @@ const addNewTask = (tasks: TaskType[], index: number, task: TaskType): TaskType[
     return copy
 }
 
+type DataType = ItemType[]
+
+type ItemType = ListType | CounterType
+
 export const Dashboard = () => {
 
-    const loadListsFromLocalStorage = (): ListType[] => {
+    const loadListsFromLocalStorage = (): DataType => {
         const listsFromLocalStorage = localStorage.getItem(KEYS.LISTS)
         return listsFromLocalStorage ? JSON.parse(listsFromLocalStorage) : Array<ListType>()
     }
 
-    const saveListsToLocalStorage = (lists: ListType[]) => localStorage.setItem(KEYS.LISTS, JSON.stringify(lists))
+    const saveListsToLocalStorage = (lists: DataType) => localStorage.setItem(KEYS.LISTS, JSON.stringify(lists))
 
-    const [lists, setLists] = useState<ListType[]>(loadListsFromLocalStorage)
+    const [lists, setLists] = useState<DataType>(loadListsFromLocalStorage)
 
     useEffect(() => {
         saveListsToLocalStorage(lists)
@@ -52,24 +57,43 @@ export const Dashboard = () => {
 
     const deleteTask = (listId: string, taskId: string) => setLists(
         lists.map(list => list.id === listId ? {
-            ...list, tasks: list.tasks.filter(task => task.id !== taskId),
+            ...list, tasks: (list as ListType).tasks.filter(task => task.id !== taskId),
         } : list),
     )
 
-    const sortCompletedLists = (lists: ListType[]): ListType[] => lists.sort((listA, listB) => listA.isDone === listB.isDone ? 0 : listA.isDone ? 1 : -1)
+    const sortCompletedLists = (lists: ListType[]): ListType[] => lists.sort((listA, listB) => {
+        if (isListType(listA) && isListType(listB)) {
+            return listA.isDone === listB.isDone ? 0 : listA.isDone ? 1 : -1
+        } else return 0
+    })
 
     const sortPinnedLists = (lists: ListType[]): ListType[] => lists.sort((listA, listB) => listA.isPinned === listB.isPinned ? 0 : listA.isPinned ? -1 : 1)
 
-    const completedListsCount = () => lists.filter(list => list.isDone).length
+    const completedListsCount = () => lists.filter(list => (list as ListType).isDone).length
 
-    const pinnedListsCount = () => lists.filter(list => list.isPinned).length
+    const pinnedListsCount = () => lists.filter(list => (list as ListType).isPinned).length
 
-    const tasksCount = () => lists.reduce((count, list) => count + list.tasks.length, 0)
+    const countersCount = lists.reduce((count, list) => {
+        if (isCounterType(list)) count++
+        return count
+    }, 0)
+
+    const listsCount = lists.reduce((count, list) => {
+        if (isListType(list)) count++
+        return count
+    }, 0)
+
+    const tasksCount = () => lists.reduce((count, list) => {
+        if (isListType(list)) count += (list as ListType).tasks.length
+        return count
+    }, 0)
 
     const completedTasksCount = () => lists.reduce((count, list) => {
-        list.tasks.forEach(task => {
-            if (task.isDone) count++
-        })
+        if (isListType(list)) {
+            (list as ListType).tasks.forEach(task => {
+                if (task.isDone) count++
+            })
+        }
 
         return count
     }, 0)
@@ -77,16 +101,16 @@ export const Dashboard = () => {
     const updateTask = (listId: string, taskId: string, isDone: boolean) => {
         const listsWithUpdatedTask = lists.map(list => list.id === listId ? {
             ...list,
-            tasks: list.tasks.map(task => task.id === taskId ? {...task, isDone} : task),
+            tasks: (list as ListType).tasks.map(task => task.id === taskId ? {...task, isDone} : task),
         } : list)
 
         const listsWithUpdatedCompletion = listsWithUpdatedTask.map(list => list.id === listId ? {
             ...list,
-            isDone: isListCompleted(list),
-            isPinned: isListCompleted(list) ? false : list.isPinned,
+            isDone: isListCompleted(list as ListType),
+            isPinned: isListCompleted(list as ListType) ? false : (list as ListType).isPinned,
         } : list)
 
-        const sortedLists = sortCompletedLists(listsWithUpdatedCompletion)
+        const sortedLists = sortCompletedLists(listsWithUpdatedCompletion as ListType[])
 
         setLists([...sortedLists])
     }
@@ -94,29 +118,29 @@ export const Dashboard = () => {
     const changeTaskName = (listId: string, taskId: string, newTaskName: string) => setLists(
         lists.map(list => list.id === listId ? {
             ...list,
-            tasks: list.tasks.map(task => task.id === taskId ? {...task, name: newTaskName} : task),
+            tasks: (list as ListType).tasks.map(task => task.id === taskId ? {...task, name: newTaskName} : task),
         } : list),
     )
 
     const moveTaskVertical = (listId: string, taskId: string, moveDown: boolean) => {
         const listIndex = lists.findIndex(list => list.id === listId)
-        const taskIndex = lists[listIndex].tasks.findIndex(task => task.id === taskId)
+        const taskIndex = (lists[listIndex] as ListType).tasks.findIndex(task => task.id === taskId)
 
-        for (let iteration = 0; iteration < lists[listIndex].tasks.length; iteration++) {
+        for (let iteration = 0; iteration < (lists[listIndex] as ListType).tasks.length; iteration++) {
             if (iteration === taskIndex) {
                 let swapIndex
 
                 if (moveDown) {
                     swapIndex = taskIndex + 1
-                    if (swapIndex === lists[listIndex].tasks.length) swapIndex = 0
+                    if (swapIndex === (lists[listIndex] as ListType).tasks.length) swapIndex = 0
                 } else {
                     swapIndex = taskIndex - 1
-                    if (swapIndex < 0) swapIndex = lists[listIndex].tasks.length - 1
+                    if (swapIndex < 0) swapIndex = (lists[listIndex] as ListType).tasks.length - 1
                 }
 
-                const swapTask = lists[listIndex].tasks[swapIndex]
-                lists[listIndex].tasks[swapIndex] = lists[listIndex].tasks[iteration]
-                lists[listIndex].tasks[iteration] = swapTask
+                const swapTask = (lists[listIndex] as ListType).tasks[swapIndex];
+                (lists[listIndex] as ListType).tasks[swapIndex] = (lists[listIndex] as ListType).tasks[iteration];
+                (lists[listIndex] as ListType).tasks[iteration] = swapTask
             }
         }
 
@@ -125,8 +149,8 @@ export const Dashboard = () => {
 
     const moveTaskHorizontal = (listId: string, taskId: string, moveRight: boolean) => {
         const listIndex = lists.findIndex(list => list.id === listId)
-        const taskIndex = lists[listIndex].tasks.findIndex(task => task.id === taskId)
-        const swapTask = lists[listIndex].tasks[taskIndex]
+        const taskIndex = (lists[listIndex] as ListType).tasks.findIndex(task => task.id === taskId)
+        const swapTask = (lists[listIndex] as ListType).tasks[taskIndex]
 
         let swapIndex
 
@@ -142,12 +166,12 @@ export const Dashboard = () => {
 
         const listsWithRemovedTask = lists.map(list => list.id === listId ? {
             ...list,
-            tasks: list.tasks.filter(task => task.id !== taskId),
+            tasks: (list as ListType).tasks.filter(task => task.id !== taskId),
         } : list)
 
         const listsWithAddedTask = listsWithRemovedTask.map(list => list.id === swapListId ? {
             ...list,
-            tasks: list.tasks[taskIndex] ? addNewTask(list.tasks, taskIndex, swapTask) : [...list.tasks, swapTask],
+            tasks: (list as ListType).tasks[taskIndex] ? addNewTask((list as ListType).tasks, taskIndex, swapTask) : [...(list as ListType).tasks, swapTask],
         } : list)
 
         setLists(listsWithAddedTask)
@@ -159,14 +183,14 @@ export const Dashboard = () => {
         const listsWithUpdatedPin = lists.map(list => list.id === listId ? {
             ...list,
             isPinned,
-            isDone: isPinned ? !isPinned : list.isDone,
-            tasks: isListCompleted(list) ? list.tasks.map(task => task.isDone ? {
+            isDone: isPinned ? !isPinned : (list as ListType).isDone,
+            tasks: isListCompleted(list as ListType) ? (list as ListType).tasks.map(task => task.isDone ? {
                 ...task,
                 isDone: !isPinned,
-            } : task) : list.tasks,
+            } : task) : (list as ListType).tasks,
         } : list)
 
-        const sortedLists = sortPinnedLists(listsWithUpdatedPin)
+        const sortedLists = sortPinnedLists(listsWithUpdatedPin as ListType[])
 
         setLists(sortedLists)
     }
@@ -177,10 +201,10 @@ export const Dashboard = () => {
             ...list,
             isDone,
             isPinned: false,
-            tasks: list.tasks.map(task => task.isDone === isDone ? task : {...task, isDone}),
+            tasks: (list as ListType).tasks.map(task => task.isDone === isDone ? task : {...task, isDone}),
         } : list)
 
-        const sortedLists = sortCompletedLists(mappedLists)
+        const sortedLists = sortCompletedLists(mappedLists as ListType[])
 
         setLists(sortedLists)
     }
@@ -213,18 +237,18 @@ export const Dashboard = () => {
     const splitList = (listId: string) => {
         const index = lists.findIndex(list => list.id === listId)
 
-        const half = lists[index].tasks.length / 2
+        const half = (lists[index] as ListType).tasks.length / 2
         if (half < 1) return
 
         const oldTasks = []
         const newTasks = []
 
-        for (let iteration = 0; iteration < lists[index].tasks.length; iteration++) {
-            if (iteration < half) oldTasks.push(lists[index].tasks[iteration])
-            if (iteration >= half) newTasks.push(lists[index].tasks[iteration])
+        for (let iteration = 0; iteration < (lists[index] as ListType).tasks.length; iteration++) {
+            if (iteration < half) oldTasks.push((lists[index] as ListType).tasks[iteration])
+            if (iteration >= half) newTasks.push((lists[index] as ListType).tasks[iteration])
         }
 
-        lists[index].tasks = oldTasks
+        (lists[index] as ListType).tasks = oldTasks
         setLists([...lists])
         addList(newTasks)
     }
@@ -254,8 +278,8 @@ export const Dashboard = () => {
 
         setLists(lists.map(list => list.id === listId ? {
             ...list,
-            tasks: [...list.tasks, newTask],
-            isDone: list.isDone ? !list.isDone : list.isDone,
+            tasks: [...(list as ListType).tasks, newTask],
+            isDone: (list as ListType).isDone ? !(list as ListType).isDone : (list as ListType).isDone,
         } : list))
     }
 
@@ -287,11 +311,35 @@ export const Dashboard = () => {
             viewList: viewList,
         }, ...lists]
 
-        const sortedLists = sortPinnedLists(updatedLists)
+        const sortedLists = sortPinnedLists(updatedLists as ListType[])
 
         setLists(sortedLists)
 
         setInputListName('')
+    }
+
+    const addCounter = () => {
+        const counter: CounterType = {
+            id: v1(),
+            name: inputCounterName ? inputCounterName : 'Counter',
+            initialCount: 0,
+            currentCount: 0,
+            limitCount: 10,
+            isDone: false,
+            setCount: setCount,
+        }
+
+        setLists([counter, ...lists])
+
+        setInputCounterName('')
+    }
+
+    const setCount = (counterId: string, count: number) => {
+        const counter = lists.find(counter => counter.id === counterId);
+
+        (counter as CounterType).currentCount = count
+
+        setLists([...lists])
     }
 
     const mockListId1 = v1()
@@ -303,7 +351,7 @@ export const Dashboard = () => {
     const mockListId7 = v1()
     const mockListId8 = v1()
 
-    const mockLists: ListType[] = [
+    const mockLists: DataType = [
         {
             id: mockListId1,
             name: 'Список продуктов',
@@ -398,6 +446,15 @@ export const Dashboard = () => {
             moveTaskVertical: moveTaskVertical,
             moveTaskHorizontal: moveTaskHorizontal,
         },
+        /*        {
+                    id: v1(),
+                    name: 'Exercises',
+                    initialCount: 0,
+                    currentCount: 0,
+                    limitCount: 10,
+                    setCount: setCount,
+                    isDone: false,
+                },*/
         {
             id: mockListId2,
             name: 'Надо изучить',
@@ -829,27 +886,35 @@ export const Dashboard = () => {
         },
     ]
 
-    const listsElements = lists.map(list => <List
+    const listsElements = lists.map(list => isListType(list) ? <List
         key={list.id}
         id={list.id}
         name={list.name}
         changeListName={changeListName}
-        tasks={list.tasks}
-        isDone={list.isDone}
-        isPinned={list.isPinned}
+        tasks={(list as ListType).tasks}
+        isDone={(list as ListType).isDone}
+        isPinned={(list as ListType).isPinned}
         deleteList={deleteList}
         addTask={addTask}
         deleteTask={deleteTask}
         updateTask={updateTask}
         changeTaskName={changeTaskName}
         pinList={pinList}
-        isSelected={list.isSelected}
+        isSelected={(list as ListType).isSelected}
         completeList={completeList}
         moveList={moveList}
         splitList={splitList}
         viewList={viewList}
         moveTaskVertical={moveTaskVertical}
         moveTaskHorizontal={moveTaskHorizontal}
+    /> : <Counter
+        id={list.id}
+        name={list.name}
+        initialCount={(list as CounterType).initialCount}
+        currentCount={(list as CounterType).currentCount}
+        limitCount={(list as CounterType).limitCount}
+        isDone={(list as CounterType).isDone}
+        setCount={setCount}
     />)
 
     const [inputListName, setInputListName] = useState<string>('')
@@ -858,7 +923,11 @@ export const Dashboard = () => {
         setInputListName(newListName)
     }
 
-    const [disabled, setDisabled] = useState<boolean>(false)
+    const [inputCounterName, setInputCounterName] = useState<string>('')
+
+    const inputCounterNameChangeHandler = (newCounterName: string) => {
+        setInputCounterName(newCounterName)
+    }
 
     const [showMenu, setShowMenu] = useState<boolean>(true)
 
@@ -906,6 +975,14 @@ export const Dashboard = () => {
                             placeholder="Enter new to-do list name"
                             buttonTitle="Create a new to-do list"
                         />
+                        <InputForm
+                            buttonIcon="➕"
+                            inputValue={inputCounterName}
+                            onClick={addCounter}
+                            onChange={inputCounterNameChangeHandler}
+                            placeholder="Enter new counter name"
+                            buttonTitle="Create a new counter"
+                        />
                         <Button
                             name={showMenu ? 'Hide statistics' : 'Show statistics'}
                             onClick={() => setShowMenu(!showMenu)}
@@ -941,8 +1018,12 @@ export const Dashboard = () => {
                             <table>
                                 <tbody>
                                 <tr>
-                                    <td>Total lists:</td>
+                                    <td>Total items:</td>
                                     <td>{lists.length}</td>
+                                </tr>
+                                <tr>
+                                    <td>Lists:</td>
+                                    <td>{listsCount}</td>
                                 </tr>
                                 <tr>
                                     <td>Completed lists:</td>
@@ -960,6 +1041,10 @@ export const Dashboard = () => {
                                     <td>Completed tasks:</td>
                                     <td>{completedTasksCount()}</td>
                                 </tr>
+                                <tr>
+                                    <td>Counters:</td>
+                                    <td>{countersCount}</td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>}
@@ -975,9 +1060,9 @@ export const Dashboard = () => {
                         id={viewableList.id}
                         name={viewableList.name}
                         changeListName={changeListName}
-                        tasks={viewableList.tasks}
-                        isDone={viewableList.isDone}
-                        isPinned={viewableList.isPinned}
+                        tasks={(viewableList as ListType).tasks}
+                        isDone={(viewableList as ListType).isDone}
+                        isPinned={(viewableList as ListType).isPinned}
                         deleteList={deleteList}
                         addTask={addTask}
                         deleteTask={deleteTask}
@@ -986,7 +1071,7 @@ export const Dashboard = () => {
                         moveTaskVertical={moveTaskVertical}
                         moveTaskHorizontal={moveTaskHorizontal}
                         pinList={pinList}
-                        isSelected={viewableList.isSelected}
+                        isSelected={(viewableList as ListType).isSelected}
                         completeList={completeList}
                         moveList={moveList}
                         splitList={splitList}
@@ -999,3 +1084,7 @@ export const Dashboard = () => {
         </Routes>
     </div>
 }
+
+const isListType = (item: ItemType): boolean => (item as ListType).tasks !== undefined
+
+const isCounterType = (item: ItemType): boolean => (item as CounterType).currentCount !== undefined
