@@ -55,17 +55,17 @@ export const Dashboard = () => {
 
     const deleteList = (listId: string) => setLists(lists.filter(list => list.id !== listId))
 
-    const deleteTask = (listId: string, taskId: string) => setLists(
-        lists.map(list => list.id === listId ? {
+    const deleteTask = (listId: string, taskId: string) => {
+        const listsWithDeletedTask = lists.map(list => list.id === listId ? {
             ...list, tasks: (list as ListType).tasks.filter(task => task.id !== taskId),
-        } : list),
-    )
+        } : list)
 
-    const sortCompletedLists = (lists: ListType[]): ListType[] => lists.sort((listA, listB) => {
-        if (isListType(listA) && isListType(listB)) {
-            return listA.isDone === listB.isDone ? 0 : listA.isDone ? 1 : -1
-        } else return 0
-    })
+        setLists(listsWithDeletedTask.map(list => list.id === listId ? {
+            ...list, isDone: isListCompleted((list as ListType)),
+        } : list))
+    }
+
+    const sortCompletedLists = (lists: ListType[]): ListType[] => lists.sort((listA, listB) => listA.isDone === listB.isDone ? 0 : listA.isDone ? 1 : -1)
 
     const sortPinnedLists = (lists: ListType[]): ListType[] => lists.sort((listA, listB) => listA.isPinned === listB.isPinned ? 0 : listA.isPinned ? -1 : 1)
 
@@ -156,10 +156,34 @@ export const Dashboard = () => {
 
         if (moveRight) {
             swapIndex = listIndex + 1
+
             if (swapIndex === lists.length) swapIndex = 0
+
+            if (!isListType(lists[swapIndex])) {
+                for (let iteration = swapIndex + 1; iteration < lists.length; iteration++) {
+                    if (isListType(lists[iteration])) {
+                        swapIndex = iteration
+                        break
+                    }
+                }
+
+                if (!isListType(lists[swapIndex])) return
+            }
         } else {
             swapIndex = listIndex - 1
+
             if (swapIndex < 0) swapIndex = lists.length - 1
+
+            if (!isListType(lists[swapIndex])) {
+                for (let iteration = swapIndex - 1; iteration >= 0; iteration--) {
+                    if (isListType(lists[iteration])) {
+                        swapIndex = iteration
+                        break
+                    }
+                }
+
+                if (!isListType(lists[swapIndex])) return
+            }
         }
 
         const swapListId = lists[swapIndex].id
@@ -174,10 +198,17 @@ export const Dashboard = () => {
             tasks: (list as ListType).tasks[taskIndex] ? addNewTask((list as ListType).tasks, taskIndex, swapTask) : [...(list as ListType).tasks, swapTask],
         } : list)
 
-        setLists(listsWithAddedTask)
+        const updatedLists = listsWithAddedTask.map(list => list.id === listId || list.id === swapListId ? {
+            ...list, isDone: isListCompleted((list as ListType)),
+        } : list)
+
+        setLists(updatedLists)
     }
 
-    const isListCompleted = (list: ListType): boolean => list.tasks.every(task => task.isDone)
+    const isListCompleted = (list: ListType): boolean => {
+        if (list.tasks.length === 0) return false
+        return list.tasks.every(task => task.isDone)
+    }
 
     const pinList = (listId: string, isPinned: boolean) => {
         const listsWithUpdatedPin = lists.map(list => list.id === listId ? {
@@ -188,6 +219,7 @@ export const Dashboard = () => {
                 ...task,
                 isDone: !isPinned,
             } : task) : (list as ListType).tasks,
+            isSelected: false,
         } : list)
 
         const sortedLists = sortPinnedLists(listsWithUpdatedPin as ListType[])
@@ -196,12 +228,12 @@ export const Dashboard = () => {
     }
 
     const completeList = (listId: string, isDone: boolean) => {
-
         const mappedLists = lists.map(list => list.id === listId ? {
             ...list,
             isDone,
             isPinned: false,
             tasks: (list as ListType).tasks.map(task => task.isDone === isDone ? task : {...task, isDone}),
+            isSelected: false,
         } : list)
 
         const sortedLists = sortCompletedLists(mappedLists as ListType[])
@@ -240,17 +272,65 @@ export const Dashboard = () => {
         const half = (lists[index] as ListType).tasks.length / 2
         if (half < 1) return
 
-        const oldTasks = []
-        const newTasks = []
+        const oldTasks: TaskType[] = []
+        const newTasks: TaskType[] = []
 
         for (let iteration = 0; iteration < (lists[index] as ListType).tasks.length; iteration++) {
             if (iteration < half) oldTasks.push((lists[index] as ListType).tasks[iteration])
             if (iteration >= half) newTasks.push((lists[index] as ListType).tasks[iteration])
         }
 
-        (lists[index] as ListType).tasks = oldTasks
-        setLists([...lists])
-        addList(newTasks)
+        const listsWithOldTasks = lists.map((list) => list.id === listId ? {
+            ...list, tasks: oldTasks, isSelected: false,
+        } : list)
+
+        const newList: ListType = {
+            id: v1(),
+            name: 'Splitted to-do list #' + lists.length,
+            changeListName: changeListName,
+            tasks: newTasks,
+            isDone: false,
+            isPinned: false,
+            deleteList: deleteList,
+            addTask: addTask,
+            deleteTask: deleteTask,
+            updateTask: updateTask,
+            changeTaskName: changeTaskName,
+            moveTaskVertical: moveTaskVertical,
+            moveTaskHorizontal: moveTaskHorizontal,
+            pinList: pinList,
+            isSelected: false,
+            completeList: completeList,
+            moveList: moveList,
+            splitList: splitList,
+            viewList: viewList,
+            mergeLists: mergeLists,
+            selectList: selectList,
+        }
+
+        const listsWithNewTasks = [newList, ...listsWithOldTasks]
+
+        const sortedLists = sortPinnedLists(listsWithNewTasks as ListType[])
+
+        setLists(sortedLists)
+    }
+
+    const mergeLists = (listId: string) => {
+        const mergedTasks: TaskType[] = []
+
+        for (let iteration = 0; iteration < lists.length; iteration++) {
+            if (isListType(lists[iteration]) && (lists[iteration] as ListType).isSelected) {
+                mergedTasks.push(...(lists[iteration] as ListType).tasks)
+            }
+        }
+
+        const listsWithMergedTasks = lists.map(list => list.id === listId ? {
+            ...list,
+            tasks: mergedTasks,
+            isSelected: false,
+        } : list)
+
+        setLists(listsWithMergedTasks.filter(list => (list as ListType).isSelected ? list.id === listId : true))
     }
 
     const viewList = (listId: string) => {
@@ -289,7 +369,7 @@ export const Dashboard = () => {
     } : list))
 
     const addList = (tasks?: TaskType[]) => {
-        const updatedLists = [{
+        const newList: ListType = {
             id: v1(),
             name: inputListName ? inputListName : 'To-do list #' + lists.length,
             changeListName: changeListName,
@@ -309,7 +389,11 @@ export const Dashboard = () => {
             moveList: moveList,
             splitList: splitList,
             viewList: viewList,
-        }, ...lists]
+            mergeLists: mergeLists,
+            selectList: selectList,
+        }
+
+        const updatedLists = [newList, ...lists]
 
         const sortedLists = sortPinnedLists(updatedLists as ListType[])
 
@@ -317,6 +401,11 @@ export const Dashboard = () => {
 
         setInputListName('')
     }
+
+    const selectList = (id: string, isSelected: boolean) => setLists(lists.map(list => list.id === id ? {
+        ...list,
+        isSelected,
+    } : list))
 
     const addCounter = () => {
         const counter: CounterType = {
@@ -329,7 +418,11 @@ export const Dashboard = () => {
             setCount: setCount,
         }
 
-        setLists([counter, ...lists])
+        const updatedLists = [counter, ...lists]
+
+        const sortedLists = sortPinnedLists(updatedLists as ListType[])
+
+        setLists(sortedLists)
 
         setInputCounterName('')
     }
@@ -371,7 +464,7 @@ export const Dashboard = () => {
                 {
                     id: v1(),
                     listId: mockListId1,
-                    name: 'Хлеб',
+                    name: 'Макароны',
                     isDone: false,
                     isSelected: false,
                     deleteTask: deleteTask,
@@ -445,6 +538,8 @@ export const Dashboard = () => {
             changeTaskName: changeTaskName,
             moveTaskVertical: moveTaskVertical,
             moveTaskHorizontal: moveTaskHorizontal,
+            mergeLists: mergeLists,
+            selectList: selectList,
         },
         /*        {
                     id: v1(),
@@ -524,6 +619,8 @@ export const Dashboard = () => {
             changeTaskName: changeTaskName,
             moveTaskVertical: moveTaskVertical,
             moveTaskHorizontal: moveTaskHorizontal,
+            mergeLists: mergeLists,
+            selectList: selectList,
         },
         {
             id: mockListId3,
@@ -594,6 +691,8 @@ export const Dashboard = () => {
             changeTaskName: changeTaskName,
             moveTaskVertical: moveTaskVertical,
             moveTaskHorizontal: moveTaskHorizontal,
+            mergeLists: mergeLists,
+            selectList: selectList,
         },
         {
             id: mockListId4,
@@ -676,6 +775,8 @@ export const Dashboard = () => {
             changeTaskName: changeTaskName,
             moveTaskVertical: moveTaskVertical,
             moveTaskHorizontal: moveTaskHorizontal,
+            mergeLists: mergeLists,
+            selectList: selectList,
         },
         {
             id: mockListId5,
@@ -697,6 +798,8 @@ export const Dashboard = () => {
             changeListName: changeListName,
             moveTaskVertical: moveTaskVertical,
             moveTaskHorizontal: moveTaskHorizontal,
+            mergeLists: mergeLists,
+            selectList: selectList,
         },
         {
             id: mockListId6,
@@ -767,6 +870,8 @@ export const Dashboard = () => {
             changeTaskName: changeTaskName,
             moveTaskVertical: moveTaskVertical,
             moveTaskHorizontal: moveTaskHorizontal,
+            mergeLists: mergeLists,
+            selectList: selectList,
         },
         {
             id: mockListId7,
@@ -825,6 +930,8 @@ export const Dashboard = () => {
             changeTaskName: changeTaskName,
             moveTaskVertical: moveTaskVertical,
             moveTaskHorizontal: moveTaskHorizontal,
+            mergeLists: mergeLists,
+            selectList: selectList,
         },
         {
             id: mockListId8,
@@ -883,6 +990,8 @@ export const Dashboard = () => {
             changeTaskName: changeTaskName,
             moveTaskVertical: moveTaskVertical,
             moveTaskHorizontal: moveTaskHorizontal,
+            mergeLists: mergeLists,
+            selectList: selectList,
         },
     ]
 
@@ -907,7 +1016,10 @@ export const Dashboard = () => {
         viewList={viewList}
         moveTaskVertical={moveTaskVertical}
         moveTaskHorizontal={moveTaskHorizontal}
+        mergeLists={mergeLists}
+        selectList={selectList}
     /> : <Counter
+        key={list.id}
         id={list.id}
         name={list.name}
         initialCount={(list as CounterType).initialCount}
@@ -931,7 +1043,7 @@ export const Dashboard = () => {
 
     const [showMenu, setShowMenu] = useState<boolean>(true)
 
-    const [listRef] = useAutoAnimate<HTMLElement>()
+    const [animateListsRef] = useAutoAnimate<HTMLElement>()
 
     const navigate = useNavigate()
 
@@ -959,7 +1071,8 @@ export const Dashboard = () => {
                     </div>}
                     <main
                         className={s.toDoLists}
-                        ref={listRef}>
+                        ref={animateListsRef}
+                    >
                         {listsElements}
                     </main>
                     <aside className={s.controlPanel}>
@@ -1076,6 +1189,8 @@ export const Dashboard = () => {
                         moveList={moveList}
                         splitList={splitList}
                         viewList={viewList}
+                        mergeLists={mergeLists}
+                        selectList={selectList}
                     />
                 </div> : <Error404/>
             }/>

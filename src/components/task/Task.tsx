@@ -1,6 +1,7 @@
 import React, {ChangeEvent, MouseEvent, useState} from 'react'
-import s from './ToDoListItem.module.css'
+import s from './Task.module.css'
 import {ActionButton} from '../actionButton/ActionButton'
+import {useAutoAnimate} from '@formkit/auto-animate/react'
 
 export type TaskType = {
     id: string
@@ -49,8 +50,13 @@ export const Task = ({
 
     const [showTooltips, setShowTooltips] = useState(false)
 
+    const [animateTaskRef] = useAutoAnimate<HTMLElement>()
+
     return <>
-        <li className={`${s.task} ${selected && s.taskSelected}`}>
+        <li
+            className={`${s.task} ${selected && s.taskSelected}`}
+            ref={animateTaskRef}
+        >
             <div className={s.taskContainer}>
                 {editing ? <textarea
                     className={s.editable}

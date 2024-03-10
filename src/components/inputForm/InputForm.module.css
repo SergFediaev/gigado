@@ -11,6 +11,7 @@
     min-width: 0;
     outline: none;
     flex-grow: 1;
+    text-overflow: ellipsis;
 }
 
 .form button {
