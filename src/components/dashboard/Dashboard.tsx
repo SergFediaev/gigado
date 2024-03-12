@@ -281,7 +281,7 @@ export const Dashboard = () => {
         }
 
         const listsWithOldTasks = lists.map((list) => list.id === listId ? {
-            ...list, tasks: oldTasks, isSelected: false,
+            ...list, tasks: oldTasks, isSelected: false, isDone: oldTasks.every(task => task.isDone),
         } : list)
 
         const newList: ListType = {
@@ -289,7 +289,7 @@ export const Dashboard = () => {
             name: 'Splitted to-do list #' + lists.length,
             changeListName: changeListName,
             tasks: newTasks,
-            isDone: false,
+            isDone: newTasks.every(task => task.isDone),
             isPinned: false,
             deleteList: deleteList,
             addTask: addTask,
@@ -306,6 +306,7 @@ export const Dashboard = () => {
             viewList: viewList,
             mergeLists: mergeLists,
             selectList: selectList,
+            clearList: clearList,
         }
 
         const listsWithNewTasks = [newList, ...listsWithOldTasks]
@@ -330,7 +331,12 @@ export const Dashboard = () => {
             isSelected: false,
         } : list)
 
-        setLists(listsWithMergedTasks.filter(list => (list as ListType).isSelected ? list.id === listId : true))
+        const updatedLists = listsWithMergedTasks.map(list => list.id === listId ? {
+            ...list,
+            isDone: isListCompleted((list as ListType)),
+        } : list)
+
+        setLists(updatedLists.filter(list => (list as ListType).isSelected ? list.id === listId : true))
     }
 
     const viewList = (listId: string) => {
@@ -391,6 +397,7 @@ export const Dashboard = () => {
             viewList: viewList,
             mergeLists: mergeLists,
             selectList: selectList,
+            clearList: clearList,
         }
 
         const updatedLists = [newList, ...lists]
@@ -405,6 +412,19 @@ export const Dashboard = () => {
     const selectList = (id: string, isSelected: boolean) => setLists(lists.map(list => list.id === id ? {
         ...list,
         isSelected,
+    } : list))
+
+    const setListsSelection = (isSelected: boolean) => setLists(lists.map(list => ({...list, isSelected})))
+
+    const isAnyListSelected = (): boolean => lists.some(list => isListType(list) && (list as ListType).isSelected)
+
+    const deleteSelectedLists = () => setLists(lists.filter(list => !isListType(list) || !(list as ListType).isSelected))
+
+    const clearList = (id: string) => setLists(lists.map(list => list.id === id ? {
+        ...list,
+        tasks: [],
+        isSelected: false,
+        isDone: false,
     } : list))
 
     const addCounter = () => {
@@ -540,16 +560,17 @@ export const Dashboard = () => {
             moveTaskHorizontal: moveTaskHorizontal,
             mergeLists: mergeLists,
             selectList: selectList,
+            clearList: clearList,
         },
-        /*        {
-                    id: v1(),
-                    name: 'Exercises',
-                    initialCount: 0,
-                    currentCount: 0,
-                    limitCount: 10,
-                    setCount: setCount,
-                    isDone: false,
-                },*/
+        {
+            id: v1(),
+            name: 'Exercises',
+            initialCount: 0,
+            currentCount: 0,
+            limitCount: 10,
+            setCount: setCount,
+            isDone: false,
+        },
         {
             id: mockListId2,
             name: 'Надо изучить',
@@ -621,6 +642,7 @@ export const Dashboard = () => {
             moveTaskHorizontal: moveTaskHorizontal,
             mergeLists: mergeLists,
             selectList: selectList,
+            clearList: clearList,
         },
         {
             id: mockListId3,
@@ -693,6 +715,7 @@ export const Dashboard = () => {
             moveTaskHorizontal: moveTaskHorizontal,
             mergeLists: mergeLists,
             selectList: selectList,
+            clearList: clearList,
         },
         {
             id: mockListId4,
@@ -777,6 +800,7 @@ export const Dashboard = () => {
             moveTaskHorizontal: moveTaskHorizontal,
             mergeLists: mergeLists,
             selectList: selectList,
+            clearList: clearList,
         },
         {
             id: mockListId5,
@@ -800,6 +824,7 @@ export const Dashboard = () => {
             moveTaskHorizontal: moveTaskHorizontal,
             mergeLists: mergeLists,
             selectList: selectList,
+            clearList: clearList,
         },
         {
             id: mockListId6,
@@ -872,6 +897,7 @@ export const Dashboard = () => {
             moveTaskHorizontal: moveTaskHorizontal,
             mergeLists: mergeLists,
             selectList: selectList,
+            clearList: clearList,
         },
         {
             id: mockListId7,
@@ -932,6 +958,7 @@ export const Dashboard = () => {
             moveTaskHorizontal: moveTaskHorizontal,
             mergeLists: mergeLists,
             selectList: selectList,
+            clearList: clearList,
         },
         {
             id: mockListId8,
@@ -992,6 +1019,7 @@ export const Dashboard = () => {
             moveTaskHorizontal: moveTaskHorizontal,
             mergeLists: mergeLists,
             selectList: selectList,
+            clearList: clearList,
         },
     ]
 
@@ -1018,6 +1046,7 @@ export const Dashboard = () => {
         moveTaskHorizontal={moveTaskHorizontal}
         mergeLists={mergeLists}
         selectList={selectList}
+        clearList={clearList}
     /> : <Counter
         key={list.id}
         id={list.id}
@@ -1051,7 +1080,33 @@ export const Dashboard = () => {
 
     const viewableList = lists.find(list => list.id === viewableListId)
 
-    const deleteAllLists = () => setLists([])
+    const deleteAllItems = () => setLists([])
+
+    const deleteAllLists = () => setLists(lists.filter(list => !isListType(list)))
+
+    const deleteAllCounters = () => setLists(lists.filter(counter => !isCounterType(counter)))
+
+    const clearAllLists = () => setLists(lists.map(list => isListType(list) && (list as ListType).tasks.length > 0 ? {
+        ...(list),
+        tasks: [],
+        isDone: false,
+    } : list))
+
+    const clearSelectedLists = () => setLists(lists.map(list => isListType(list) && (list as ListType).isSelected && (list as ListType).tasks.length > 0 ? {
+        ...list,
+        tasks: [],
+        isDone: false,
+        isSelected: false,
+    } : list))
+
+    const resetAllCounters = () => setLists(lists.map(counter => isCounterType(counter) && (counter as CounterType).currentCount !== (counter as CounterType).initialCount ? {
+        ...counter,
+        currentCount: 0,
+    } : counter))
+
+    const isListsHaveTask = (): boolean => lists.some(list => isListType(list) && (list as ListType).tasks.length > 0)
+
+    const isCountersHaveCount = (): boolean => lists.some(counter => isCounterType(counter) && (counter as CounterType).currentCount !== (counter as CounterType).initialCount)
 
     const [backgroundImage, setBackgroundImage] = useState<string>(CONSTANTS.RANDOM_BACKGROUND_IMAGE_URL)
 
@@ -1097,6 +1152,11 @@ export const Dashboard = () => {
                             buttonTitle="Create a new counter"
                         />
                         <Button
+                            name={isAnyListSelected() ? 'Unselect all lists' : 'Select all lists'}
+                            onClick={() => setListsSelection(!isAnyListSelected())}
+                            disabled={listsCount === 0}
+                        />
+                        <Button
                             name={showMenu ? 'Hide statistics' : 'Show statistics'}
                             onClick={() => setShowMenu(!showMenu)}
                         />
@@ -1122,8 +1182,32 @@ export const Dashboard = () => {
                             onClick={addMockedListsHandler}
                         />
                         <Button
-                            name="Delete all lists"
-                            onClick={deleteAllLists}
+                            name="Reset all counters"
+                            onClick={resetAllCounters}
+                            disabled={countersCount === 0 || !isCountersHaveCount()}
+                            important={true}
+                        />
+                        <Button
+                            name={isAnyListSelected() ? 'Clear all tasks in selected lists' : 'Clear tasks in all lists'}
+                            onClick={isAnyListSelected() ? clearSelectedLists : clearAllLists}
+                            disabled={listsCount === 0 || !isListsHaveTask()}
+                            important={true}
+                        />
+                        <Button
+                            name={'Delete all counters'}
+                            onClick={deleteAllCounters}
+                            disabled={countersCount === 0}
+                            important={true}
+                        />
+                        <Button
+                            name={isAnyListSelected() ? 'Delete selected lists' : 'Delete all lists'}
+                            onClick={isAnyListSelected() ? deleteSelectedLists : deleteAllLists}
+                            disabled={listsCount === 0}
+                            important={true}
+                        />
+                        <Button
+                            name={'Delete all items'}
+                            onClick={deleteAllItems}
                             disabled={lists.length === 0}
                             important={true}
                         />
@@ -1191,6 +1275,7 @@ export const Dashboard = () => {
                         viewList={viewList}
                         mergeLists={mergeLists}
                         selectList={selectList}
+                        clearList={clearList}
                     />
                 </div> : <Error404/>
             }/>

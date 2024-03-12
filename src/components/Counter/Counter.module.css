@@ -18,10 +18,6 @@
     cursor: pointer;
 }
 
-.spinAnimation {
-    animation: spin .5s ease-in-out;
-}
-
 .counter h3 {
     font-family: Consolas, monospace;
     font-size: 1.5rem;
@@ -45,6 +41,10 @@
 .counter button {
     color: #fff;
     font-family: Consolas, monospace;
+}
+
+.spinAnimation {
+    animation: spin .5s ease-in-out;
 }
 
 @keyframes spin {

@@ -26,7 +26,7 @@
 }
 
 .toDoLists {
-    width: 70%;
+    width: 70vw;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;

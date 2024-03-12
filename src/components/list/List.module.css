@@ -11,8 +11,8 @@
 }
 
 .completedToDoList {
-    background-color: greenyellow;
-    opacity: .9;
+    background-color: rgba(173, 255, 47, .9);
+    backdrop-filter: blur(10px);
 }
 
 .completedToDoListName {
@@ -69,4 +69,14 @@
     resize: none;
     outline: none;
     box-shadow: 0 0 5px 1px rgba(0, 0, 0, .5) inset;
+}
+
+.spinAnimation {
+    animation: spin .5s ease-in-out;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
 }

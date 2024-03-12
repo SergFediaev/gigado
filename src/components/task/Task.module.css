@@ -10,9 +10,13 @@
 }
 
 .taskSelected {
-    background-color: #f0fff3;
+    border: 2px #f00 dashed;
     padding: 10px;
     border-radius: 10px;
+}
+
+.taskSelected .control {
+    margin-top: 10px;
 }
 
 .taskName {

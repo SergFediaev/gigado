@@ -1,6 +1,6 @@
 import {Task, TaskType} from '../task/Task'
 import React, {MouseEvent, useState} from 'react'
-import S from './List.module.css'
+import s from './List.module.css'
 import {ActionButton} from '../actionButton/ActionButton'
 import {InputForm} from '../inputForm/InputForm'
 import {useAutoAnimate} from '@formkit/auto-animate/react'
@@ -27,6 +27,7 @@ export type ListType = {
     viewList: (listId: string) => void
     mergeLists: (listId: string) => void
     selectList: (id: string, isSelected: boolean) => void
+    clearList: (id: string) => void
 }
 
 export const List = ({
@@ -51,6 +52,7 @@ export const List = ({
                          moveTaskHorizontal,
                          mergeLists,
                          selectList,
+                         clearList,
                      }: ListType) => {
     const tasksElements = tasks.map(task => {
 
@@ -126,23 +128,31 @@ export const List = ({
 
     const [showTaskInput, setShowTaskInput] = useState<boolean>(false)
 
+    const [spin, setSpin] = useState<boolean>(false)
+
+    const clearListHandler = () => {
+        setSpin(true)
+        clearList(id)
+    }
+
     return <div
         ref={animateListRef}
-        className={`${S.toDoList} ${isDone ? S.completedToDoList : isPinned ? S.pinnedToDoList : undefined} ${isSelected && S.selected}`}
+        className={`${s.toDoList} ${isDone ? s.completedToDoList : isPinned ? s.pinnedToDoList : undefined} ${isSelected && s.selected} ${spin && s.spinAnimation}`}
         onMouseEnter={() => setShowTaskInput(true)}
         onMouseLeave={() => setShowTaskInput(false)}
+        onAnimationEnd={() => setSpin(false)}
     >
         <h2>{isPinned && '📍 '}{isDone && '✅ '}{listNameEditing ? <textarea
-            className={S.editable}
+            className={s.editable}
             value={listNameInput}
             onChange={(event) => setListNameInput(event.currentTarget.value)}
             onBlur={changeListNameHandler}
             autoFocus
         /> : <span
-            className={`${isDone && S.completedToDoListName} ${S.listTitle}`}
+            className={`${isDone && s.completedToDoListName} ${s.listTitle}`}
             onClick={(event) => selectListHandler(event)}
         >{name}</span>}</h2>
-        {isSelected && <div className={S.control}>
+        {isSelected && <div className={s.control}>
             <ActionButton
                 name={showTooltips ? 'Hide tooltips' : 'Show tooltips'}
                 icon={showTooltips ? '🙈' : '❓'}
@@ -191,6 +201,13 @@ export const List = ({
                 onClickCallback={() => viewList(id)}
                 tooltips={showTooltips}
             />
+            {tasks.length > 0 && <ActionButton
+                name="Clear all tasks"
+                icon="🧹"
+                onClickCallback={clearListHandler}
+                important
+                tooltips={showTooltips}
+            />}
             <ActionButton
                 name="Delete"
                 icon="🗑️"
@@ -199,9 +216,9 @@ export const List = ({
                 tooltips={showTooltips}
             />
         </div>}
-        <p className={S.listId}>List ID: {id}</p>
+        <p className={s.listId}>List ID: {id}</p>
         <ol
-            className={S.tasks}
+            className={s.tasks}
             ref={animateTasksRef}
         >
             {tasksElements.length > 0 ? tasksElements :

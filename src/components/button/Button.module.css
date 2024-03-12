@@ -4,6 +4,7 @@
     padding: 10px;
     border-radius: 20px;
     color: #fff;
+    transition: .5s linear;
 }
 
 .button:hover:enabled {
@@ -27,7 +28,7 @@
 }
 
 .importantButton:hover:enabled {
-    background-color: rgba(255, 69, 0, .3);
+    background-color: rgba(255, 216, 202, .9);
     border-color: orangered;
     color: #000;
 }
