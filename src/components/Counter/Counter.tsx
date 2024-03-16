@@ -1,7 +1,7 @@
 import s from './Counter.module.css'
 import {useState} from 'react'
 
-export type CounterType = {
+type CounterPropsType = {
     id: string
     name: string
     initialCount: number
@@ -17,7 +17,7 @@ export const Counter = ({
                             initialCount,
                             currentCount,
                             setCount,
-                        }: CounterType) => {
+                        }: CounterPropsType) => {
     const [spin, setSpin] = useState(false)
 
     const resetHandler = () => {

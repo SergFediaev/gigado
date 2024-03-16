@@ -1,11 +1,12 @@
-import {Task, TaskType} from '../task/Task'
+import {Task} from '../task/Task'
 import React, {MouseEvent, useState} from 'react'
 import s from './List.module.css'
 import {ActionButton} from '../actionButton/ActionButton'
 import {InputForm} from '../inputForm/InputForm'
 import {useAutoAnimate} from '@formkit/auto-animate/react'
+import {TaskType} from '../dashboard/Dashboard'
 
-export type ListType = {
+export type ListPropsType = {
     id: string
     name: string
     changeListName: (listId: string, newListName: string) => void
@@ -28,6 +29,9 @@ export type ListType = {
     mergeLists: (listId: string) => void
     selectList: (id: string, isSelected: boolean) => void
     clearList: (id: string) => void
+    selectedListsCount: number
+    itemsCount: number
+    listsCount: number
 }
 
 export const List = ({
@@ -53,7 +57,10 @@ export const List = ({
                          mergeLists,
                          selectList,
                          clearList,
-                     }: ListType) => {
+                         selectedListsCount,
+                         itemsCount,
+                         listsCount,
+                     }: ListPropsType) => {
     const tasksElements = tasks.map(task => {
 
         const deleteTaskHandler = (listId: string, taskId: string) => {
@@ -88,6 +95,8 @@ export const List = ({
             updateTask={updateTaskHandler}
             moveTaskVertical={moveTaskVerticalHandler}
             moveTaskHorizontal={moveTaskHorizontalHandler}
+            tasksCount={tasks.length}
+            listsCount={listsCount}
         />
     })
 
@@ -165,49 +174,53 @@ export const List = ({
                 onClickCallback={() => pinList(id, !isPinned)}
                 tooltips={showTooltips}
             />
-            <ActionButton
-                name={isDone ? 'Uncomplete' : 'Complete'}
-                icon={isDone ? '❎' : '✅'}
-                onClickCallback={() => completeList(id, !isDone)}
-                tooltips={showTooltips}
-            />
-            <ActionButton
-                name="Move left"
-                icon="⬅️"
-                onClickCallback={() => moveList(id, true)}
-                tooltips={showTooltips}
-            />
-            <ActionButton
-                name="Move right"
-                icon="➡️"
-                onClickCallback={() => moveList(id, false)}
-                tooltips={showTooltips}
-            />
+            {itemsCount > 1 && <>
+                <ActionButton
+                    name="Move left"
+                    icon="⬅️"
+                    onClickCallback={() => moveList(id, true)}
+                    tooltips={showTooltips}
+                />
+                <ActionButton
+                    name="Move right"
+                    icon="➡️"
+                    onClickCallback={() => moveList(id, false)}
+                    tooltips={showTooltips}
+                />
+            </>}
             {tasks.length > 1 && <ActionButton
                 name="Split"
                 icon="🔪"
                 onClickCallback={() => splitList(id)}
                 tooltips={showTooltips}
             />}
-            <ActionButton
+            {selectedListsCount > 1 && <ActionButton
                 name="Merge"
                 icon="🩹"
                 onClickCallback={() => mergeLists(id)}
                 tooltips={showTooltips}
-            />
+            />}
             <ActionButton
                 name="View"
                 icon="👀"
                 onClickCallback={() => viewList(id)}
                 tooltips={showTooltips}
             />
-            {tasks.length > 0 && <ActionButton
-                name="Clear all tasks"
-                icon="🧹"
-                onClickCallback={clearListHandler}
-                important
-                tooltips={showTooltips}
-            />}
+            {tasks.length > 0 && <>
+                <ActionButton
+                    name={isDone ? 'Uncomplete' : 'Complete'}
+                    icon={isDone ? '❎' : '✅'}
+                    onClickCallback={() => completeList(id, !isDone)}
+                    tooltips={showTooltips}
+                />
+                <ActionButton
+                    name="Clear all tasks"
+                    icon="🧹"
+                    onClickCallback={clearListHandler}
+                    important
+                    tooltips={showTooltips}
+                />
+            </>}
             <ActionButton
                 name="Delete"
                 icon="🗑️"

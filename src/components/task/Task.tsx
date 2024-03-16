@@ -3,7 +3,7 @@ import s from './Task.module.css'
 import {ActionButton} from '../actionButton/ActionButton'
 import {useAutoAnimate} from '@formkit/auto-animate/react'
 
-export type TaskType = {
+export type TaskPropsType = {
     id: string
     listId: string
     name: string
@@ -14,6 +14,8 @@ export type TaskType = {
     changeTaskName: (listId: string, id: string, newTaskName: string) => void
     moveTaskVertical: (listId: string, taskId: string, moveDown: boolean) => void
     moveTaskHorizontal: (listId: string, taskId: string, moveRight: boolean) => void
+    tasksCount: number
+    listsCount: number
 }
 
 export const Task = ({
@@ -27,7 +29,9 @@ export const Task = ({
                          updateTask,
                          moveTaskVertical,
                          moveTaskHorizontal,
-                     }: TaskType) => {
+                         tasksCount,
+                         listsCount,
+                     }: TaskPropsType) => {
     const onClickHandler = () => deleteTask(listId, id)
 
     const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => updateTask(listId, id, event.currentTarget.checked)
@@ -89,31 +93,36 @@ export const Task = ({
                     onClickCallback={onClickHandler}
                     tooltips={showTooltips}
                 />
-                <ActionButton
-                    name="Move up"
-                    icon="⬆️"
-                    onClickCallback={() => moveTaskVertical(listId, id, false)}
-                    tooltips={showTooltips}
-                />
-                <ActionButton
-                    name="Move down"
-                    icon="⬇️"
-                    onClickCallback={() => moveTaskVertical(listId, id, true)}
-                    tooltips={showTooltips}
-                />
-                <ActionButton
-                    name="Move left"
-                    icon="⬅️"
-                    onClickCallback={() => moveTaskHorizontal(listId, id, false)}
-                    tooltips={showTooltips}
-                />
-                <ActionButton
-                    name="Move right"
-                    icon="➡️"
-                    onClickCallback={() => moveTaskHorizontal(listId, id, true)}
-                    tooltips={showTooltips}
-                />
-            </div>}
+                {tasksCount > 1 && <>
+                    <ActionButton
+                        name="Move up"
+                        icon="⬆️"
+                        onClickCallback={() => moveTaskVertical(listId, id, false)}
+                        tooltips={showTooltips}
+                    />
+                    <ActionButton
+                        name="Move down"
+                        icon="⬇️"
+                        onClickCallback={() => moveTaskVertical(listId, id, true)}
+                        tooltips={showTooltips}
+                    />
+                </>}
+                {listsCount > 1 && <>
+                    <ActionButton
+                        name="Move left"
+                        icon="⬅️"
+                        onClickCallback={() => moveTaskHorizontal(listId, id, false)}
+                        tooltips={showTooltips}
+                    />
+                    <ActionButton
+                        name="Move right"
+                        icon="➡️"
+                        onClickCallback={() => moveTaskHorizontal(listId, id, true)}
+                        tooltips={showTooltips}
+                    />
+                </>}
+            </div>
+            }
         </li>
     </>
 }

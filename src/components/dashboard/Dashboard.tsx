@@ -1,15 +1,15 @@
 import React, {useEffect, useState} from 'react'
 import {Button} from '../button/Button'
-import {List, ListType} from '../list/List'
+import {List} from '../list/List'
 import {v1} from 'uuid'
 import s from './Dashboard.module.css'
 import '../common.css'
-import {TaskType} from '../task/Task'
 import {useAutoAnimate} from '@formkit/auto-animate/react'
 import {Navigate, Route, Routes, useNavigate} from 'react-router-dom'
 import {Error404} from '../error404/Error404'
 import {InputForm} from '../inputForm/InputForm'
-import {Counter, CounterType} from '../Counter/Counter'
+import {Counter} from '../Counter/Counter'
+import {mockedTasks, mockLists} from '../../mock/mockedLists'
 
 export const PATH = {
     ROOT: '/',
@@ -22,6 +22,7 @@ export const PATH = {
 
 const KEYS = {
     LISTS: 'lists',
+    TASKS: 'tasks',
 } as const
 
 const CONSTANTS = {
@@ -29,40 +30,91 @@ const CONSTANTS = {
 } as const
 
 const addNewTask = (tasks: TaskType[], index: number, task: TaskType): TaskType[] => {
-    const copy = [...tasks]
-    copy.splice(index, 0, task)
-    return copy
+    const tasksCopy = [...tasks]
+    tasksCopy.splice(index, 0, task)
+    return tasksCopy
 }
 
-type DataType = ItemType[]
+export type DataType = ItemType[]
 
 type ItemType = ListType | CounterType
 
-export const Dashboard = () => {
+export type ListType = {
+    id: string
+    name: string
+    isSelected: boolean
+    isPinned: boolean
+    isDone: boolean
+}
 
+export type TasksType = {
+    [listId: string]: TaskType[]
+}
+
+export type TaskType = {
+    id: string
+    listId: string
+    name: string
+    isSelected: boolean
+    isDone: boolean
+}
+
+export type CounterType = {
+    id: string
+    name: string
+    initialCount: number
+    currentCount: number
+    limitCount: number
+    isDone: boolean
+}
+
+export const Dashboard = () => {
     const loadListsFromLocalStorage = (): DataType => {
         const listsFromLocalStorage = localStorage.getItem(KEYS.LISTS)
         return listsFromLocalStorage ? JSON.parse(listsFromLocalStorage) : Array<ListType>()
     }
 
+    const loadTasksFromLocalStorage = (): TasksType => {
+        const tasksFromLocalStorage = localStorage.getItem(KEYS.TASKS)
+        return tasksFromLocalStorage ? JSON.parse(tasksFromLocalStorage) : {}
+    }
+
     const saveListsToLocalStorage = (lists: DataType) => localStorage.setItem(KEYS.LISTS, JSON.stringify(lists))
 
+    const saveTasksToLocalStorage = (tasks: TasksType) => localStorage.setItem(KEYS.TASKS, JSON.stringify(tasks))
+
     const [lists, setLists] = useState<DataType>(loadListsFromLocalStorage)
+
+    const [tasks, setTasks] = useState<TasksType>(loadTasksFromLocalStorage)
 
     useEffect(() => {
         saveListsToLocalStorage(lists)
     }, [lists])
 
-    const deleteList = (listId: string) => setLists(lists.filter(list => list.id !== listId))
+    useEffect(() => {
+        saveTasksToLocalStorage(tasks)
+    }, [tasks])
+
+    const deleteList = (listId: string) => {
+        const tasksCopy: TasksType = {...tasks}
+        delete tasksCopy[listId]
+
+        setLists(lists.filter(list => list.id !== listId))
+        setTasks(tasksCopy)
+    }
 
     const deleteTask = (listId: string, taskId: string) => {
-        const listsWithDeletedTask = lists.map(list => list.id === listId ? {
-            ...list, tasks: (list as ListType).tasks.filter(task => task.id !== taskId),
-        } : list)
+        const tasksWithDeletedTask: TasksType = {...tasks, [listId]: tasks[listId].filter(task => task.id !== taskId)}
+        const isDone = isTasksCompleted(tasksWithDeletedTask[listId])
 
-        setLists(listsWithDeletedTask.map(list => list.id === listId ? {
-            ...list, isDone: isListCompleted((list as ListType)),
-        } : list))
+        const updatedLists = lists.map(list => list.id === listId ? {
+            ...list, isDone, isPinned: isDone ? false : (list as ListType).isPinned,
+        } as ListType : list)
+
+        if (isDone) sortCompletedLists(updatedLists as ListType[])
+
+        setTasks(tasksWithDeletedTask)
+        setLists(updatedLists)
     }
 
     const sortCompletedLists = (lists: ListType[]): ListType[] => lists.sort((listA, listB) => listA.isDone === listB.isDone ? 0 : listA.isDone ? 1 : -1)
@@ -73,8 +125,8 @@ export const Dashboard = () => {
 
     const pinnedListsCount = () => lists.filter(list => (list as ListType).isPinned).length
 
-    const countersCount = lists.reduce((count, list) => {
-        if (isCounterType(list)) count++
+    const countersCount = lists.reduce((count, counter) => {
+        if (isCounterType(counter)) count++
         return count
     }, 0)
 
@@ -83,80 +135,81 @@ export const Dashboard = () => {
         return count
     }, 0)
 
-    const tasksCount = () => lists.reduce((count, list) => {
-        if (isListType(list)) count += (list as ListType).tasks.length
+    const selectedListsCount = lists.reduce((count, list) => {
+        if (isListType(list) && (list as ListType).isSelected) count++
         return count
     }, 0)
 
-    const completedTasksCount = () => lists.reduce((count, list) => {
-        if (isListType(list)) {
-            (list as ListType).tasks.forEach(task => {
-                if (task.isDone) count++
-            })
-        }
+    const tasksCount = () => Object.values(tasks).reduce((count, tasks) => count + tasks.length, 0)
+
+    const completedTasksCount = () => Object.values(tasks).reduce((count, tasks) => {
+        tasks.forEach(task => {
+            if (task.isDone) count++
+        })
 
         return count
     }, 0)
 
     const updateTask = (listId: string, taskId: string, isDone: boolean) => {
-        const listsWithUpdatedTask = lists.map(list => list.id === listId ? {
+        const updatedTasks: TasksType = {
+            ...tasks,
+            [listId]: tasks[listId].map(task => task.id === taskId ? {...task, isDone} : task),
+        }
+
+        const isListDone = isTasksCompleted(updatedTasks[listId])
+
+        const updatedLists = lists.map(list => list.id === listId ? {
             ...list,
-            tasks: (list as ListType).tasks.map(task => task.id === taskId ? {...task, isDone} : task),
-        } : list)
+            isDone: isListDone,
+            isPinned: isListDone ? false : (list as ListType).isPinned,
+        } as ListType : list)
 
-        const listsWithUpdatedCompletion = listsWithUpdatedTask.map(list => list.id === listId ? {
-            ...list,
-            isDone: isListCompleted(list as ListType),
-            isPinned: isListCompleted(list as ListType) ? false : (list as ListType).isPinned,
-        } : list)
+        if (isListDone) sortCompletedLists(updatedLists as ListType[])
 
-        const sortedLists = sortCompletedLists(listsWithUpdatedCompletion as ListType[])
-
-        setLists([...sortedLists])
+        setTasks(updatedTasks)
+        setLists(updatedLists)
     }
 
-    const changeTaskName = (listId: string, taskId: string, newTaskName: string) => setLists(
-        lists.map(list => list.id === listId ? {
-            ...list,
-            tasks: (list as ListType).tasks.map(task => task.id === taskId ? {...task, name: newTaskName} : task),
-        } : list),
-    )
+    const changeTaskName = (listId: string, taskId: string, name: string) => setTasks({
+        ...tasks,
+        [listId]: tasks[listId].map(task => task.id === taskId ? {...task, name} : task),
+    })
 
     const moveTaskVertical = (listId: string, taskId: string, moveDown: boolean) => {
-        const listIndex = lists.findIndex(list => list.id === listId)
-        const taskIndex = (lists[listIndex] as ListType).tasks.findIndex(task => task.id === taskId)
+        const tasksCopy: TasksType = {...tasks}
+        const updatedTasks: TaskType[] = tasksCopy[listId]
+        const taskIndex = updatedTasks.findIndex(task => task.id === taskId)
 
-        for (let iteration = 0; iteration < (lists[listIndex] as ListType).tasks.length; iteration++) {
+        for (let iteration = 0; iteration < updatedTasks.length; iteration++) {
             if (iteration === taskIndex) {
                 let swapIndex
 
                 if (moveDown) {
                     swapIndex = taskIndex + 1
-                    if (swapIndex === (lists[listIndex] as ListType).tasks.length) swapIndex = 0
+                    if (swapIndex === updatedTasks.length) swapIndex = 0
                 } else {
                     swapIndex = taskIndex - 1
-                    if (swapIndex < 0) swapIndex = (lists[listIndex] as ListType).tasks.length - 1
+                    if (swapIndex < 0) swapIndex = updatedTasks.length - 1
                 }
 
-                const swapTask = (lists[listIndex] as ListType).tasks[swapIndex];
-                (lists[listIndex] as ListType).tasks[swapIndex] = (lists[listIndex] as ListType).tasks[iteration];
-                (lists[listIndex] as ListType).tasks[iteration] = swapTask
+                const swapTask = updatedTasks[swapIndex]
+                updatedTasks[swapIndex] = updatedTasks[iteration]
+                updatedTasks[iteration] = swapTask
+                break
             }
         }
 
-        setLists([...lists])
+        setTasks(tasksCopy)
     }
 
     const moveTaskHorizontal = (listId: string, taskId: string, moveRight: boolean) => {
         const listIndex = lists.findIndex(list => list.id === listId)
-        const taskIndex = (lists[listIndex] as ListType).tasks.findIndex(task => task.id === taskId)
-        const swapTask = (lists[listIndex] as ListType).tasks[taskIndex]
-
+        const taskIndex = tasks[listId].findIndex(task => task.id === taskId)
+        const swapTask = tasks[listId][taskIndex]
         let swapIndex
 
         if (moveRight) {
             swapIndex = listIndex + 1
-
             if (swapIndex === lists.length) swapIndex = 0
 
             if (!isListType(lists[swapIndex])) {
@@ -171,7 +224,6 @@ export const Dashboard = () => {
             }
         } else {
             swapIndex = listIndex - 1
-
             if (swapIndex < 0) swapIndex = lists.length - 1
 
             if (!isListType(lists[swapIndex])) {
@@ -188,154 +240,144 @@ export const Dashboard = () => {
 
         const swapListId = lists[swapIndex].id
 
-        const listsWithRemovedTask = lists.map(list => list.id === listId ? {
-            ...list,
-            tasks: (list as ListType).tasks.filter(task => task.id !== taskId),
-        } : list)
+        const updatedTasks: TasksType = {
+            ...tasks,
+            [listId]: tasks[listId].filter(task => task.id !== taskId),
+            [swapListId]: tasks[swapListId][taskIndex] ? addNewTask(tasks[swapListId], taskIndex, swapTask) : [...tasks[swapListId], swapTask],
+        }
 
-        const listsWithAddedTask = listsWithRemovedTask.map(list => list.id === swapListId ? {
+        setLists(lists.map(list => list.id === listId || list.id === swapListId ? {
             ...list,
-            tasks: (list as ListType).tasks[taskIndex] ? addNewTask((list as ListType).tasks, taskIndex, swapTask) : [...(list as ListType).tasks, swapTask],
-        } : list)
+            isDone: isTasksCompleted(updatedTasks[list.id]),
+            isPinned: isTasksCompleted(updatedTasks[list.id]) ? false : (list as ListType).isPinned,
+        } as ListType : list))
 
-        const updatedLists = listsWithAddedTask.map(list => list.id === listId || list.id === swapListId ? {
-            ...list, isDone: isListCompleted((list as ListType)),
-        } : list)
+        setTasks(updatedTasks)
+    }
+
+    const isListCompleted = (list: ListType): boolean => {
+        if (tasks[list.id].length === 0) return false
+        return tasks[list.id].every(task => task.isDone)
+    }
+
+    const isTasksCompleted = (tasks: TaskType[]): boolean => {
+        if (tasks.length === 0) return false
+        return tasks.every(task => task.isDone)
+    }
+
+    const pinList = (listId: string, isPinned: boolean) => {
+        const updatedLists = lists.map(list => list.id === listId ? {
+            ...list,
+            isPinned,
+            isDone: isPinned ? false : (list as ListType).isDone,
+            isSelected: (list as ListType).isSelected ? false : (list as ListType).isSelected,
+        } as ListType : list)
+
+        sortPinnedLists(updatedLists as ListType[])
+
+        setLists(updatedLists)
+        if (isPinned && lists.find(list => list.id === listId)?.isDone) setTasks({
+            ...tasks,
+            [listId]: tasks[listId].map(task => task.isDone ? {...task, isDone: false} : task),
+        })
+    }
+
+    const completeList = (listId: string, isDone: boolean) => {
+        const updatedLists = lists.map(list => list.id === listId ? {
+            ...list,
+            isDone,
+            isPinned: isDone ? false : (list as ListType).isPinned,
+            isSelected: (list as ListType).isSelected ? false : (list as ListType).isSelected,
+        } as ListType : list)
+
+        sortCompletedLists(updatedLists as ListType[])
+
+        setTasks({...tasks, [listId]: tasks[listId].map(task => task.isDone === isDone ? task : {...task, isDone})})
+        setLists(updatedLists)
+    }
+
+    const moveList = (listId: string, moveLeft: boolean) => {
+        const updatedLists: ItemType[] = [...lists]
+        const listIndex = updatedLists.findIndex(list => list.id === listId)
+
+        for (let iteration = 0; iteration < updatedLists.length; iteration++) {
+            if (iteration === listIndex) {
+                let swapIndex
+
+                if (moveLeft) {
+                    swapIndex = listIndex - 1
+                    if (swapIndex < 0) swapIndex = updatedLists.length - 1
+                } else {
+                    swapIndex = listIndex + 1
+                    if (swapIndex === updatedLists.length) swapIndex = 0
+                }
+
+                const swapList: ItemType = updatedLists[swapIndex]
+                updatedLists[swapIndex] = updatedLists[iteration]
+                updatedLists[iteration] = swapList
+                break
+            }
+        }
 
         setLists(updatedLists)
     }
 
-    const isListCompleted = (list: ListType): boolean => {
-        if (list.tasks.length === 0) return false
-        return list.tasks.every(task => task.isDone)
-    }
-
-    const pinList = (listId: string, isPinned: boolean) => {
-        const listsWithUpdatedPin = lists.map(list => list.id === listId ? {
-            ...list,
-            isPinned,
-            isDone: isPinned ? !isPinned : (list as ListType).isDone,
-            tasks: isListCompleted(list as ListType) ? (list as ListType).tasks.map(task => task.isDone ? {
-                ...task,
-                isDone: !isPinned,
-            } : task) : (list as ListType).tasks,
-            isSelected: false,
-        } : list)
-
-        const sortedLists = sortPinnedLists(listsWithUpdatedPin as ListType[])
-
-        setLists(sortedLists)
-    }
-
-    const completeList = (listId: string, isDone: boolean) => {
-        const mappedLists = lists.map(list => list.id === listId ? {
-            ...list,
-            isDone,
-            isPinned: false,
-            tasks: (list as ListType).tasks.map(task => task.isDone === isDone ? task : {...task, isDone}),
-            isSelected: false,
-        } : list)
-
-        const sortedLists = sortCompletedLists(mappedLists as ListType[])
-
-        setLists(sortedLists)
-    }
-
-    const moveList = (listId: string, moveLeft: boolean) => {
-        const listIndex = lists.findIndex(list => list.id === listId)
-
-        let swapIndex
-
-        if (moveLeft) {
-            swapIndex = listIndex - 1
-        } else {
-            swapIndex = listIndex + 1
-        }
-
-        for (let iteration = 0; iteration < lists.length; iteration++) {
-            if (iteration === listIndex) {
-                if (swapIndex < 0) swapIndex = lists.length - 1
-                if (swapIndex === lists.length) swapIndex = 0
-
-                const swapList = lists[swapIndex]
-                lists[swapIndex] = lists[iteration]
-                lists[iteration] = swapList
-            }
-        }
-
-        setLists([...lists])
-    }
-
     const splitList = (listId: string) => {
-        const index = lists.findIndex(list => list.id === listId)
-
-        const half = (lists[index] as ListType).tasks.length / 2
+        const half = tasks[listId].length / 2
         if (half < 1) return
 
         const oldTasks: TaskType[] = []
         const newTasks: TaskType[] = []
 
-        for (let iteration = 0; iteration < (lists[index] as ListType).tasks.length; iteration++) {
-            if (iteration < half) oldTasks.push((lists[index] as ListType).tasks[iteration])
-            if (iteration >= half) newTasks.push((lists[index] as ListType).tasks[iteration])
+        for (let iteration = 0; iteration < tasks[listId].length; iteration++) {
+            if (iteration < half) oldTasks.push(tasks[listId][iteration])
+            if (iteration >= half) newTasks.push(tasks[listId][iteration])
         }
 
-        const listsWithOldTasks = lists.map((list) => list.id === listId ? {
-            ...list, tasks: oldTasks, isSelected: false, isDone: oldTasks.every(task => task.isDone),
-        } : list)
+        const newListId = v1()
 
         const newList: ListType = {
-            id: v1(),
+            id: newListId,
             name: 'Splitted to-do list #' + lists.length,
-            changeListName: changeListName,
-            tasks: newTasks,
-            isDone: newTasks.every(task => task.isDone),
+            isDone: isTasksCompleted(newTasks),
             isPinned: false,
-            deleteList: deleteList,
-            addTask: addTask,
-            deleteTask: deleteTask,
-            updateTask: updateTask,
-            changeTaskName: changeTaskName,
-            moveTaskVertical: moveTaskVertical,
-            moveTaskHorizontal: moveTaskHorizontal,
-            pinList: pinList,
             isSelected: false,
-            completeList: completeList,
-            moveList: moveList,
-            splitList: splitList,
-            viewList: viewList,
-            mergeLists: mergeLists,
-            selectList: selectList,
-            clearList: clearList,
         }
 
-        const listsWithNewTasks = [newList, ...listsWithOldTasks]
+        const updatedLists = [newList, ...lists.map(list => list.id === listId ? {
+            ...list,
+            isSelected: (list as ListType).isSelected ? false : (list as ListType).isSelected,
+            isDone: isTasksCompleted(oldTasks),
+        } as ListType : list)]
 
-        const sortedLists = sortPinnedLists(listsWithNewTasks as ListType[])
+        sortPinnedLists(updatedLists as ListType[])
+        sortCompletedLists(updatedLists as ListType[])
 
-        setLists(sortedLists)
+        setTasks({...tasks, [listId]: oldTasks, [newListId]: newTasks})
+        setLists(updatedLists)
     }
 
     const mergeLists = (listId: string) => {
         const mergedTasks: TaskType[] = []
+        const updatedTasks: TasksType = {...tasks}
 
         for (let iteration = 0; iteration < lists.length; iteration++) {
             if (isListType(lists[iteration]) && (lists[iteration] as ListType).isSelected) {
-                mergedTasks.push(...(lists[iteration] as ListType).tasks)
+                mergedTasks.push(...updatedTasks[lists[iteration].id])
+                delete updatedTasks[lists[iteration].id]
             }
         }
 
-        const listsWithMergedTasks = lists.map(list => list.id === listId ? {
+        const isMergedTasksDone = isTasksCompleted(mergedTasks)
+
+        const updatedLists = lists.map(list => list.id === listId ? {
             ...list,
-            tasks: mergedTasks,
             isSelected: false,
+            isDone: isMergedTasksDone,
+            isPinned: isMergedTasksDone ? false : (list as ListType).isPinned,
         } : list)
 
-        const updatedLists = listsWithMergedTasks.map(list => list.id === listId ? {
-            ...list,
-            isDone: isListCompleted((list as ListType)),
-        } : list)
-
+        setTasks({...updatedTasks, [listId]: mergedTasks})
         setLists(updatedLists.filter(list => (list as ListType).isSelected ? list.id === listId : true))
     }
 
@@ -349,67 +391,45 @@ export const Dashboard = () => {
     }
 
     const addTask = (listId: string, taskName: string) => {
-        const newTask = {
+        const newTask: TaskType = {
             id: v1(),
             listId: listId,
             name: taskName ? taskName : 'Task.',
             isDone: false,
             isSelected: false,
-            deleteTask: deleteTask,
-            updateTask: updateTask,
-            changeTaskName: changeTaskName,
-            moveTaskVertical: moveTaskVertical,
-            moveTaskHorizontal: moveTaskHorizontal,
         }
 
+        setTasks({...tasks, [listId]: [...tasks[listId], newTask]})
         setLists(lists.map(list => list.id === listId ? {
             ...list,
-            tasks: [...(list as ListType).tasks, newTask],
-            isDone: (list as ListType).isDone ? !(list as ListType).isDone : (list as ListType).isDone,
-        } : list))
+            isDone: (list as ListType).isDone ? false : (list as ListType).isDone,
+        } as ListType : list))
     }
 
-    const changeListName = (listId: string, newListName: string) => setLists(lists.map(list => list.id === listId ? {
-        ...list,
-        name: newListName,
+    const changeListName = (listId: string, name: string) => setLists(lists.map(list => list.id === listId ? {
+        ...list, name,
     } : list))
 
-    const addList = (tasks?: TaskType[]) => {
+    const addList = (newTasks?: TaskType[]) => {
+        const newListId = v1()
+
         const newList: ListType = {
-            id: v1(),
+            id: newListId,
             name: inputListName ? inputListName : 'To-do list #' + lists.length,
-            changeListName: changeListName,
-            tasks: tasks || [],
             isDone: false,
             isPinned: false,
-            deleteList: deleteList,
-            addTask: addTask,
-            deleteTask: deleteTask,
-            updateTask: updateTask,
-            changeTaskName: changeTaskName,
-            moveTaskVertical: moveTaskVertical,
-            moveTaskHorizontal: moveTaskHorizontal,
-            pinList: pinList,
             isSelected: false,
-            completeList: completeList,
-            moveList: moveList,
-            splitList: splitList,
-            viewList: viewList,
-            mergeLists: mergeLists,
-            selectList: selectList,
-            clearList: clearList,
         }
 
         const updatedLists = [newList, ...lists]
+        sortPinnedLists(updatedLists as ListType[])
 
-        const sortedLists = sortPinnedLists(updatedLists as ListType[])
-
-        setLists(sortedLists)
-
+        setLists(updatedLists)
+        setTasks({...tasks, [newListId]: newTasks || []})
         setInputListName('')
     }
 
-    const selectList = (id: string, isSelected: boolean) => setLists(lists.map(list => list.id === id ? {
+    const selectList = (listId: string, isSelected: boolean) => setLists(lists.map(list => list.id === listId ? {
         ...list,
         isSelected,
     } : list))
@@ -420,12 +440,15 @@ export const Dashboard = () => {
 
     const deleteSelectedLists = () => setLists(lists.filter(list => !isListType(list) || !(list as ListType).isSelected))
 
-    const clearList = (id: string) => setLists(lists.map(list => list.id === id ? {
-        ...list,
-        tasks: [],
-        isSelected: false,
-        isDone: false,
-    } : list))
+    const clearList = (listId: string) => {
+        setLists(lists.map(list => list.id === listId ? {
+            ...list,
+            isSelected: (list as ListType).isSelected ? false : (list as ListType).isSelected,
+            isDone: (list as ListType).isDone ? false : (list as ListType).isDone,
+        } as ListType : list))
+
+        setTasks({...tasks, [listId]: []})
+    }
 
     const addCounter = () => {
         const counter: CounterType = {
@@ -435,7 +458,6 @@ export const Dashboard = () => {
             currentCount: 0,
             limitCount: 10,
             isDone: false,
-            setCount: setCount,
         }
 
         const updatedLists = [counter, ...lists]
@@ -455,580 +477,12 @@ export const Dashboard = () => {
         setLists([...lists])
     }
 
-    const mockListId1 = v1()
-    const mockListId2 = v1()
-    const mockListId3 = v1()
-    const mockListId4 = v1()
-    const mockListId5 = v1()
-    const mockListId6 = v1()
-    const mockListId7 = v1()
-    const mockListId8 = v1()
-
-    const mockLists: DataType = [
-        {
-            id: mockListId1,
-            name: 'Список продуктов',
-            tasks: [
-                {
-                    id: v1(),
-                    listId: mockListId1,
-                    name: 'Хлеб',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId1,
-                    name: 'Макароны',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId1,
-                    name: 'Молоко',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId1,
-                    name: 'Овощи',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId1,
-                    name: 'Сладости',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId1,
-                    name: 'Орехи',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-            ],
-            isDone: false,
-            isPinned: true,
-            deleteList: deleteList,
-            addTask: addTask,
-            deleteTask: deleteTask,
-            updateTask: updateTask,
-            pinList: pinList,
-            isSelected: false,
-            completeList: completeList,
-            moveList: moveList,
-            splitList: splitList,
-            viewList: viewList,
-            changeListName: changeListName,
-            changeTaskName: changeTaskName,
-            moveTaskVertical: moveTaskVertical,
-            moveTaskHorizontal: moveTaskHorizontal,
-            mergeLists: mergeLists,
-            selectList: selectList,
-            clearList: clearList,
-        },
-        {
-            id: v1(),
-            name: 'Exercises',
-            initialCount: 0,
-            currentCount: 0,
-            limitCount: 10,
-            setCount: setCount,
-            isDone: false,
-        },
-        {
-            id: mockListId2,
-            name: 'Надо изучить',
-            tasks: [
-                {
-                    id: v1(),
-                    listId: mockListId2,
-                    name: 'HTML',
-                    isDone: true,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId2,
-                    name: 'CSS',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId2,
-                    name: 'Native',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId2,
-                    name: 'React',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-            ],
-            isDone: false,
-            isPinned: true,
-            deleteList: deleteList,
-            addTask: addTask,
-            deleteTask: deleteTask,
-            updateTask: updateTask,
-            pinList: pinList,
-            isSelected: false,
-            completeList: completeList,
-            moveList: moveList,
-            splitList: splitList,
-            viewList: viewList,
-            changeListName: changeListName,
-            changeTaskName: changeTaskName,
-            moveTaskVertical: moveTaskVertical,
-            moveTaskHorizontal: moveTaskHorizontal,
-            mergeLists: mergeLists,
-            selectList: selectList,
-            clearList: clearList,
-        },
-        {
-            id: mockListId3,
-            name: 'Докупить',
-            tasks: [
-                {
-                    id: v1(),
-                    listId: mockListId3,
-                    name: 'Масло',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId3,
-                    name: 'Огурцы',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId3,
-                    name: 'Помидоры',
-                    isDone: true,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId3,
-                    name: 'Яблоки',
-                    isDone: true,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-            ],
-            isDone: false,
-            isPinned: false,
-            deleteList: deleteList,
-            addTask: addTask,
-            deleteTask: deleteTask,
-            updateTask: updateTask,
-            pinList: pinList,
-            isSelected: false,
-            completeList: completeList,
-            moveList: moveList,
-            splitList: splitList,
-            viewList: viewList,
-            changeListName: changeListName,
-            changeTaskName: changeTaskName,
-            moveTaskVertical: moveTaskVertical,
-            moveTaskHorizontal: moveTaskHorizontal,
-            mergeLists: mergeLists,
-            selectList: selectList,
-            clearList: clearList,
-        },
-        {
-            id: mockListId4,
-            name: 'Доделать в проекте',
-            tasks: [
-                {
-                    id: v1(),
-                    listId: mockListId4,
-                    name: 'Имутабельность',
-                    isDone: true,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId4,
-                    name: 'Случайный задний фон по клику кнопки',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId4,
-                    name: 'Ассоциативные массивы',
-                    isDone: true,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId4,
-                    name: 'Удалить все листы разом',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId4,
-                    name: 'Меню-гамбургер',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-            ],
-            isDone: false,
-            isPinned: false,
-            deleteList: deleteList,
-            addTask: addTask,
-            deleteTask: deleteTask,
-            updateTask: updateTask,
-            pinList: pinList,
-            isSelected: false,
-            completeList: completeList,
-            moveList: moveList,
-            splitList: splitList,
-            viewList: viewList,
-            changeListName: changeListName,
-            changeTaskName: changeTaskName,
-            moveTaskVertical: moveTaskVertical,
-            moveTaskHorizontal: moveTaskHorizontal,
-            mergeLists: mergeLists,
-            selectList: selectList,
-            clearList: clearList,
-        },
-        {
-            id: mockListId5,
-            name: 'Пустой список без названия',
-            tasks: [],
-            isDone: false,
-            isPinned: false,
-            deleteList: deleteList,
-            addTask: addTask,
-            deleteTask: deleteTask,
-            updateTask: updateTask,
-            changeTaskName: changeTaskName,
-            pinList: pinList,
-            isSelected: false,
-            completeList: completeList,
-            moveList: moveList,
-            splitList: splitList,
-            viewList: viewList,
-            changeListName: changeListName,
-            moveTaskVertical: moveTaskVertical,
-            moveTaskHorizontal: moveTaskHorizontal,
-            mergeLists: mergeLists,
-            selectList: selectList,
-            clearList: clearList,
-        },
-        {
-            id: mockListId6,
-            name: 'Почитать',
-            tasks: [
-                {
-                    id: v1(),
-                    listId: mockListId6,
-                    name: 'Маршрутизация в реакте',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId6,
-                    name: 'Сравнение ссылок под капотом',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId6,
-                    name: 'Многопоточность',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId6,
-                    name: 'Асинхронные функции',
-                    isDone: false,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-            ],
-            isDone: false,
-            isPinned: false,
-            deleteList: deleteList,
-            addTask: addTask,
-            deleteTask: deleteTask,
-            updateTask: updateTask,
-            pinList: pinList,
-            isSelected: false,
-            completeList: completeList,
-            moveList: moveList,
-            splitList: splitList,
-            viewList: viewList,
-            changeListName: changeListName,
-            changeTaskName: changeTaskName,
-            moveTaskVertical: moveTaskVertical,
-            moveTaskHorizontal: moveTaskHorizontal,
-            mergeLists: mergeLists,
-            selectList: selectList,
-            clearList: clearList,
-        },
-        {
-            id: mockListId7,
-            name: 'Ремонт',
-            tasks: [
-                {
-                    id: v1(),
-                    listId: mockListId7,
-                    name: 'Выбрать обои',
-                    isDone: true,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId7,
-                    name: 'Разобрать старую мебель',
-                    isDone: true,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId7,
-                    name: 'Собрать новую кухню',
-                    isDone: true,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-            ],
-            isDone: true,
-            isPinned: false,
-            deleteList: deleteList,
-            addTask: addTask,
-            deleteTask: deleteTask,
-            updateTask: updateTask,
-            pinList: pinList,
-            isSelected: false,
-            completeList: completeList,
-            moveList: moveList,
-            splitList: splitList,
-            viewList: viewList,
-            changeListName: changeListName,
-            changeTaskName: changeTaskName,
-            moveTaskVertical: moveTaskVertical,
-            moveTaskHorizontal: moveTaskHorizontal,
-            mergeLists: mergeLists,
-            selectList: selectList,
-            clearList: clearList,
-        },
-        {
-            id: mockListId8,
-            name: 'Посмотреть',
-            tasks: [
-                {
-                    id: v1(),
-                    listId: mockListId8,
-                    name: 'Вёрстка на Styled Components',
-                    isDone: true,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId8,
-                    name: 'TDD подход к разработке',
-                    isDone: true,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-                {
-                    id: v1(),
-                    listId: mockListId8,
-                    name: 'ООП, СОЛИД и вот это вот всё',
-                    isDone: true,
-                    isSelected: false,
-                    deleteTask: deleteTask,
-                    updateTask: updateTask,
-                    changeTaskName: changeTaskName,
-                    moveTaskVertical: moveTaskVertical,
-                    moveTaskHorizontal: moveTaskHorizontal,
-                },
-            ],
-            isDone: true,
-            isPinned: false,
-            deleteList: deleteList,
-            addTask: addTask,
-            deleteTask: deleteTask,
-            updateTask: updateTask,
-            pinList: pinList,
-            isSelected: false,
-            completeList: completeList,
-            moveList: moveList,
-            splitList: splitList,
-            viewList: viewList,
-            changeListName: changeListName,
-            changeTaskName: changeTaskName,
-            moveTaskVertical: moveTaskVertical,
-            moveTaskHorizontal: moveTaskHorizontal,
-            mergeLists: mergeLists,
-            selectList: selectList,
-            clearList: clearList,
-        },
-    ]
-
     const listsElements = lists.map(list => isListType(list) ? <List
         key={list.id}
         id={list.id}
         name={list.name}
         changeListName={changeListName}
-        tasks={(list as ListType).tasks}
+        tasks={tasks[list.id]}
         isDone={(list as ListType).isDone}
         isPinned={(list as ListType).isPinned}
         deleteList={deleteList}
@@ -1047,6 +501,9 @@ export const Dashboard = () => {
         mergeLists={mergeLists}
         selectList={selectList}
         clearList={clearList}
+        selectedListsCount={selectedListsCount}
+        itemsCount={lists.length}
+        listsCount={listsCount}
     /> : <Counter
         key={list.id}
         id={list.id}
@@ -1086,25 +543,41 @@ export const Dashboard = () => {
 
     const deleteAllCounters = () => setLists(lists.filter(counter => !isCounterType(counter)))
 
-    const clearAllLists = () => setLists(lists.map(list => isListType(list) && (list as ListType).tasks.length > 0 ? {
-        ...(list),
-        tasks: [],
-        isDone: false,
-    } : list))
+    const clearAllLists = () => {
+        let clearedTasks: TasksType = {...tasks}
 
-    const clearSelectedLists = () => setLists(lists.map(list => isListType(list) && (list as ListType).isSelected && (list as ListType).tasks.length > 0 ? {
-        ...list,
-        tasks: [],
-        isDone: false,
-        isSelected: false,
-    } : list))
+        lists.forEach(list => {
+            if (isListType(list) && tasks[list.id].length > 0) clearedTasks[list.id] = []
+        })
+
+        setTasks(clearedTasks)
+        setLists(lists.map(list => isListType(list) && tasks[list.id].length > 0 ? {
+            ...list,
+            isDone: (list as ListType).isDone ? false : (list as ListType).isDone,
+        } as ListType : list))
+    }
+
+    const clearSelectedLists = () => {
+        const clearedTasks: TasksType = {...tasks}
+
+        lists.forEach(list => {
+            if (isListType(list) && (list as ListType).isSelected) clearedTasks[list.id] = []
+        })
+
+        setTasks(clearedTasks)
+        setLists(lists.map(list => isListType(list) && (list as ListType).isSelected && tasks[list.id].length > 0 ? {
+            ...list,
+            isDone: (list as ListType).isDone ? false : (list as ListType).isDone,
+            isSelected: false,
+        } as ListType : list))
+    }
 
     const resetAllCounters = () => setLists(lists.map(counter => isCounterType(counter) && (counter as CounterType).currentCount !== (counter as CounterType).initialCount ? {
         ...counter,
         currentCount: 0,
     } : counter))
 
-    const isListsHaveTask = (): boolean => lists.some(list => isListType(list) && (list as ListType).tasks.length > 0)
+    const isListsHaveTask = (): boolean => Object.values(tasks).some(tasks => tasks.length > 0)
 
     const isCountersHaveCount = (): boolean => lists.some(counter => isCounterType(counter) && (counter as CounterType).currentCount !== (counter as CounterType).initialCount)
 
@@ -1112,7 +585,10 @@ export const Dashboard = () => {
 
     const setBackgroundImageHandler = () => setBackgroundImage(CONSTANTS.RANDOM_BACKGROUND_IMAGE_URL)
 
-    const addMockedListsHandler = () => setLists([...mockLists, ...lists])
+    const addMockedListsHandler = () => {
+        setLists([...mockLists, ...lists])
+        setTasks({...tasks, ...mockedTasks})
+    }
 
     return <div
         className={s.dashboard}
@@ -1257,7 +733,7 @@ export const Dashboard = () => {
                         id={viewableList.id}
                         name={viewableList.name}
                         changeListName={changeListName}
-                        tasks={(viewableList as ListType).tasks}
+                        tasks={tasks[viewableList.id]}
                         isDone={(viewableList as ListType).isDone}
                         isPinned={(viewableList as ListType).isPinned}
                         deleteList={deleteList}
@@ -1276,6 +752,9 @@ export const Dashboard = () => {
                         mergeLists={mergeLists}
                         selectList={selectList}
                         clearList={clearList}
+                        itemsCount={listsCount}
+                        selectedListsCount={selectedListsCount}
+                        listsCount={listsCount}
                     />
                 </div> : <Error404/>
             }/>
@@ -1285,6 +764,6 @@ export const Dashboard = () => {
     </div>
 }
 
-const isListType = (item: ItemType): boolean => (item as ListType).tasks !== undefined
+const isListType = (item: ItemType): boolean => (item as ListType).isPinned !== undefined
 
 const isCounterType = (item: ItemType): boolean => (item as CounterType).currentCount !== undefined
