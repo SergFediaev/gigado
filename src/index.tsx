@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import reportWebVitals from './reportWebVitals'
 import {HashRouter} from 'react-router-dom'
 import {Dashboard} from './components/dashboard/Dashboard'
+import {state} from './store/state'
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement,
@@ -11,7 +12,7 @@ const root = ReactDOM.createRoot(
 root.render(
     <React.StrictMode>
         <HashRouter>
-            <Dashboard/>
+            <Dashboard initialState={state}/>
         </HashRouter>
     </React.StrictMode>,
 )

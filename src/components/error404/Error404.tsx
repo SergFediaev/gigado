@@ -1,7 +1,7 @@
 import s from './Error404.module.css'
 import {Button} from '../button/Button'
 import {useNavigate} from 'react-router-dom'
-import {PATH} from '../dashboard/Dashboard'
+import {PATHS} from '../../strings/paths'
 
 export const Error404 = () => {
     const navigate = useNavigate()
@@ -18,7 +18,7 @@ export const Error404 = () => {
             </ul>
         </div>
         <div className={s.overlay}>
-            <Button name="Back to dashboard 📊" onClick={() => navigate(PATH.DASHBOARD)}/>
+            <Button name="Back to dashboard 📊" onClick={() => navigate(PATHS.DASHBOARD)}/>
         </div>
     </div>
 }

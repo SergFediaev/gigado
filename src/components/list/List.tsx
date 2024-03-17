@@ -4,7 +4,7 @@ import s from './List.module.css'
 import {ActionButton} from '../actionButton/ActionButton'
 import {InputForm} from '../inputForm/InputForm'
 import {useAutoAnimate} from '@formkit/auto-animate/react'
-import {TaskType} from '../dashboard/Dashboard'
+import {TaskType} from '../../store/types/stateTypes'
 
 export type ListPropsType = {
     id: string
