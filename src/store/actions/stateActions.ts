@@ -131,6 +131,7 @@ export const setListsSelection = (isSelected: boolean) => ({
 
 export const deleteSelectedLists = () => ({
     type: ACTIONS.DELETE_SELECTED_LISTS,
+    payload: {},
 } as const)
 
 export const clearList = (listId: string) => ({
@@ -157,28 +158,35 @@ export const setCount = (counterId: string, count: number) => ({
 
 export const deleteAllItems = () => ({
     type: ACTIONS.DELETE_ALL_ITEMS,
+    payload: {},
 } as const)
 
 export const deleteAllLists = () => ({
     type: ACTIONS.DELETE_ALL_LISTS,
+    payload: {},
 } as const)
 
 export const deleteAllCounters = () => ({
     type: ACTIONS.DELETE_ALL_COUNTERS,
+    payload: {},
 } as const)
 
 export const clearAllLists = () => ({
     type: ACTIONS.CLEAR_ALL_LISTS,
+    payload: {},
 } as const)
 
 export const clearSelectedLists = () => ({
     type: ACTIONS.CLEAR_SELECTED_LISTS,
+    payload: {},
 } as const)
 
 export const resetAllCounters = () => ({
     type: ACTIONS.RESET_ALL_COUNTERS,
+    payload: {},
 } as const)
 
 export const addMockedLists = () => ({
     type: ACTIONS.ADD_MOCKED_LISTS,
+    payload: {},
 } as const)

@@ -15,10 +15,11 @@ import {ACTIONS} from '../../strings/actions'
 import {getMockedData} from '../mockedData'
 
 export const stateReducer = (state: StateType, action: StateActionType): StateType => {
-    switch (action.type) {
+    const {type, payload} = action
+    switch (type) {
 
         case ACTIONS.DELETE_LIST: {
-            const {listId} = action.payload
+            const {listId} = payload
             const stateCopy: StateType = {
                 ...state,
                 lists: state.lists.filter(list => list.id !== listId),
@@ -29,7 +30,7 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
         }
 
         case ACTIONS.DELETE_TASK: {
-            const {listId, taskId} = action.payload
+            const {listId, taskId} = payload
             const stateCopy: StateType = {
                 ...state,
                 tasks: {...state.tasks, [listId]: state.tasks[listId].filter(task => task.id !== taskId)},
@@ -48,7 +49,7 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
         }
 
         case ACTIONS.UPDATE_TASK: {
-            const {listId, taskId, isDone} = action.payload
+            const {listId, taskId, isDone} = payload
             const stateCopy: StateType = {
                 ...state, tasks: {
                     ...state.tasks,
@@ -71,7 +72,7 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
         }
 
         case ACTIONS.CHANGE_TASK_NAME: {
-            const {listId, taskId, name} = action.payload
+            const {listId, taskId, name} = payload
             return {
                 ...state, tasks: {
                     ...state.tasks,
@@ -81,7 +82,7 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
         }
 
         case ACTIONS.MOVE_TASK_VERTICAL: {
-            const {listId, taskId, moveDown} = action.payload
+            const {listId, taskId, moveDown} = payload
             const stateCopy: StateType = {...state, tasks: {...state.tasks, [listId]: [...state.tasks[listId]]}}
             const updatedTasks: TaskType[] = stateCopy.tasks[listId]
             const taskIndex = updatedTasks.findIndex(task => task.id === taskId)
@@ -109,7 +110,7 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
         }
 
         case ACTIONS.MOVE_TASK_HORIZONTAL: {
-            const {listId, taskId, moveRight} = action.payload
+            const {listId, taskId, moveRight} = payload
             const listIndex = state.lists.findIndex(list => list.id === listId)
             const taskIndex = state.tasks[listId].findIndex(task => task.id === taskId)
             const swapTask: TaskType = state.tasks[listId][taskIndex]
@@ -167,7 +168,7 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
         }
 
         case ACTIONS.PIN_LIST: {
-            const {listId, isPinned} = action.payload
+            const {listId, isPinned} = payload
             const stateCopy: StateType = {
                 ...state, lists: state.lists.map(list => list.id === listId ? {
                     ...list,
@@ -189,7 +190,7 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
         }
 
         case ACTIONS.COMPLETE_LIST: {
-            const {listId, isDone} = action.payload
+            const {listId, isDone} = payload
             const updatedLists: StateType = {
                 ...state, lists: state.lists.map(list => list.id === listId ? {
                     ...list,
@@ -211,7 +212,7 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
         }
 
         case ACTIONS.MOVE_LIST: {
-            const {listId, moveLeft} = action.payload
+            const {listId, moveLeft} = payload
 
             const stateCopy: StateType = {
                 ...state, lists: [...state.lists,
@@ -243,7 +244,7 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
         }
 
         case ACTIONS.SPLIT_LIST: {
-            const {listId} = action.payload
+            const {listId} = payload
             const half = state.tasks[listId].length / 2
             if (half < 1) break
 
@@ -283,7 +284,7 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
         }
 
         case ACTIONS.MERGE_LISTS: {
-            const {listId} = action.payload
+            const {listId} = payload
             const mergedTasks: TaskType[] = []
             const updatedTasks: StateType = {...state, tasks: {...state.tasks}}
 
@@ -311,7 +312,7 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
         }
 
         case ACTIONS.ADD_TASK: {
-            const {listId, taskName} = action.payload
+            const {listId, taskName} = payload
             const newTask: TaskType = {
                 id: v1(),
                 listId: listId,
@@ -332,13 +333,13 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
 
         case ACTIONS.CHANGE_LIST_NAME:
             return {
-                ...state, lists: state.lists.map(list => list.id === action.payload.listId ? {
-                    ...list, name: action.payload.name,
+                ...state, lists: state.lists.map(list => list.id === payload.listId ? {
+                    ...list, name: payload.name,
                 } : list),
             } as StateType
 
         case ACTIONS.ADD_LIST: {
-            const {newTasks, inputListName} = action.payload
+            const {newTasks, inputListName} = payload
             const newListId = v1()
 
             const newList: ListType = {
@@ -361,16 +362,16 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
 
         case ACTIONS.SELECT_LIST:
             return {
-                ...state, lists: state.lists.map(list => list.id === action.payload.listId ? {
+                ...state, lists: state.lists.map(list => list.id === payload.listId ? {
                     ...list,
-                    isSelected: action.payload.isSelected,
+                    isSelected: payload.isSelected,
                 } : list),
             } as StateType
 
         case ACTIONS.SET_LISTS_SELECTION:
             return {
                 ...state,
-                lists: state.lists.map(list => ({...list, isSelected: action.payload.isSelected})),
+                lists: state.lists.map(list => ({...list, isSelected: payload.isSelected})),
             } as StateType
 
         case ACTIONS.DELETE_SELECTED_LISTS:
@@ -380,17 +381,17 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
 
         case ACTIONS.CLEAR_LIST:
             return {
-                ...state, lists: state.lists.map(list => list.id === action.payload.listId ? {
+                ...state, lists: state.lists.map(list => list.id === payload.listId ? {
                     ...list,
                     isSelected: (list as ListType).isSelected ? false : (list as ListType).isSelected,
                     isDone: (list as ListType).isDone ? false : (list as ListType).isDone,
-                } as ListType : list), tasks: {...state.tasks, [action.payload.listId]: []},
+                } as ListType : list), tasks: {...state.tasks, [payload.listId]: []},
             } as StateType
 
         case ACTIONS.ADD_COUNTER: {
             const counter: CounterType = {
                 id: v1(),
-                name: action.payload.inputCounterName || 'Counter',
+                name: payload.inputCounterName || 'Counter',
                 initialCount: 0,
                 currentCount: 0,
                 limitCount: 10,
@@ -405,9 +406,9 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
         case ACTIONS.SET_COUNT:
             return {
                 ...state,
-                lists: state.lists.map(counter => counter.id === action.payload.counterId ? {
+                lists: state.lists.map(counter => counter.id === payload.counterId ? {
                     ...counter,
-                    currentCount: action.payload.count,
+                    currentCount: payload.count,
                 } as CounterType : counter),
             } as StateType
 
