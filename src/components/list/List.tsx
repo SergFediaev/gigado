@@ -5,6 +5,10 @@ import {ActionButton} from '../actionButton/ActionButton'
 import {InputForm} from '../inputForm/InputForm'
 import {useAutoAnimate} from '@formkit/auto-animate/react'
 import {TaskType} from '../../store/types/stateTypes'
+import {PATHS} from '../../strings/paths'
+import {useNavigate} from 'react-router-dom'
+import {settings} from '../../store/settings'
+import {RENDERING} from '../../strings/strings'
 
 export type ListPropsType = {
     id: string
@@ -25,7 +29,6 @@ export type ListPropsType = {
     completeList: (listId: string, isComplete: boolean) => void
     moveList: (listId: string, moveLeft: boolean) => void
     splitList: (listId: string) => void
-    viewList: (listId: string) => void
     mergeLists: (listId: string) => void
     selectList: (id: string, isSelected: boolean) => void
     clearList: (id: string) => void
@@ -51,7 +54,6 @@ export const List = ({
                          completeList,
                          moveList,
                          splitList,
-                         viewList,
                          moveTaskVertical,
                          moveTaskHorizontal,
                          mergeLists,
@@ -61,6 +63,8 @@ export const List = ({
                          itemsCount,
                          listsCount,
                      }: ListPropsType) => {
+    if (settings.dev.logMainRender) console.log(RENDERING.LIST_NAME, name)
+
     const tasksElements = tasks.map(task => {
 
         const deleteTaskHandler = (listId: string, taskId: string) => {
@@ -120,7 +124,7 @@ export const List = ({
         else selectList(id, !isSelected)
     }
 
-    const [showTooltips, setShowTooltips] = useState(false)
+    const [showTooltips, setShowTooltips] = useState(settings.lists.showTooltips)
 
     const [listNameEditing, setListNameEditing] = useState<boolean>(false)
 
@@ -135,7 +139,7 @@ export const List = ({
 
     const [animateTasksRef] = useAutoAnimate<HTMLOListElement>()
 
-    const [showTaskInput, setShowTaskInput] = useState<boolean>(false)
+    const [showTaskInput, setShowTaskInput] = useState<boolean>(settings.lists.showInput)
 
     const [spin, setSpin] = useState<boolean>(false)
 
@@ -144,11 +148,22 @@ export const List = ({
         clearList(id)
     }
 
+    const navigate = useNavigate()
+
+    const onListHoverHandler = () => {
+        if (!settings.lists.showInput) setShowTaskInput(true)
+
+    }
+
+    const onListUnhoverHandler = () => {
+        if (!settings.lists.showInput) setShowTaskInput(false)
+    }
+
     return <div
         ref={animateListRef}
         className={`${s.toDoList} ${isDone ? s.completedToDoList : isPinned ? s.pinnedToDoList : undefined} ${isSelected && s.selected} ${spin && s.spinAnimation}`}
-        onMouseEnter={() => setShowTaskInput(true)}
-        onMouseLeave={() => setShowTaskInput(false)}
+        onMouseEnter={() => onListHoverHandler()}
+        onMouseLeave={() => onListUnhoverHandler()}
         onAnimationEnd={() => setSpin(false)}
     >
         <h2>{isPinned && '📍 '}{isDone && '✅ '}{listNameEditing ? <textarea
@@ -203,7 +218,7 @@ export const List = ({
             <ActionButton
                 name="View"
                 icon="👀"
-                onClickCallback={() => viewList(id)}
+                onClickCallback={() => navigate(`${PATHS.DASHBOARD}${PATHS.LIST}/${id}`)}
                 tooltips={showTooltips}
             />
             {tasks.length > 0 && <>
@@ -229,7 +244,7 @@ export const List = ({
                 tooltips={showTooltips}
             />
         </div>}
-        <p className={s.listId}>List ID: {id}</p>
+        {settings.lists.showId && <p className={s.listId}>List ID: {id}</p>}
         <ol
             className={s.tasks}
             ref={animateTasksRef}

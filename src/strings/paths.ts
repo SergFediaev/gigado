@@ -5,4 +5,5 @@ export const PATHS = {
     LIST: '/list',
     ID: '/:id',
     ERROR_404: '/error404',
+    SETTINGS: '/settings',
 } as const

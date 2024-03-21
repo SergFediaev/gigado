@@ -1,0 +1,10 @@
+.dashboard {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    background: center / cover no-repeat fixed coral;
+}
+
+.debug * {
+    border: solid 1px #0f0;
+}

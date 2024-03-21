@@ -1,5 +1,5 @@
 import {v1} from 'uuid'
-import {StateActionType} from '../types/actionTypes'
+import {StateActionType} from '../types/stateActionTypes'
 import {
     addNewTask,
     isCounterType,
@@ -10,9 +10,9 @@ import {
 } from './stateReducerHelpers'
 import {CounterType, ItemType, ListType, StateType, TasksType, TaskType} from '../types/stateTypes'
 import {ERRORS} from '../../strings/errors'
-import {settings} from '../settings'
 import {ACTIONS} from '../../strings/actions'
 import {getMockedData} from '../mockedData'
+import {settings} from '../settings'
 
 export const stateReducer = (state: StateType, action: StateActionType): StateType => {
     const {type, payload} = action

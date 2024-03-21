@@ -2,6 +2,8 @@ import React, {ChangeEvent, MouseEvent, useState} from 'react'
 import s from './Task.module.css'
 import {ActionButton} from '../actionButton/ActionButton'
 import {useAutoAnimate} from '@formkit/auto-animate/react'
+import {settings} from '../../store/settings'
+import {RENDERING} from '../../strings/strings'
 
 export type TaskPropsType = {
     id: string
@@ -32,6 +34,8 @@ export const Task = ({
                          tasksCount,
                          listsCount,
                      }: TaskPropsType) => {
+    if (settings.dev.logTasksRender) console.log(RENDERING.TASK_NAME, name)
+
     const onClickHandler = () => deleteTask(listId, id)
 
     const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => updateTask(listId, id, event.currentTarget.checked)

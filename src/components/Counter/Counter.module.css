@@ -1,10 +1,4 @@
 .counter {
-    min-width: 300px;
-    min-height: 300px;
-    max-width: 600px;
-    max-height: 600px;
-    background-color: #252525;
-    color: #fff;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -14,11 +8,20 @@
     box-shadow: 0 0 20px 10px rgba(255, 255, 255, .5) inset;
 }
 
-.counter button {
+.counter, .top, .bottom {
+    min-width: 300px;
+    min-height: 300px;
+    max-width: 600px;
+    max-height: 600px;
+    background-color: #252525;
+    color: #fff;
+}
+
+.counter button, .bottom button {
     cursor: pointer;
 }
 
-.counter h3 {
+.counter h3, .top h3 {
     font-family: Consolas, monospace;
     font-size: 1.5rem;
 }
@@ -38,7 +41,7 @@
     font-family: Consolas, monospace;
 }
 
-.counter button {
+.counter button, .bottom button {
     color: #fff;
     font-family: Consolas, monospace;
 }
@@ -51,4 +54,25 @@
     100% {
         transform: rotate(360deg);
     }
+}
+
+.top {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    border-radius: 50% 50% 0 0;
+    box-shadow: 10px 0 5px -5px rgba(255, 255, 255, .5) inset,
+    -10px 0 5px -5px rgba(255, 255, 255, .5) inset,
+    0 10px 5px -5px rgba(255, 255, 255, .5) inset;
+}
+
+.bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 0 0 50% 50%;
+    box-shadow: 10px 0 5px -5px rgba(255, 255, 255, .5) inset,
+    -10px 0 5px -5px rgba(255, 255, 255, .5) inset,
+    0 -10px 5px -5px rgba(255, 255, 255, .5) inset;
 }
