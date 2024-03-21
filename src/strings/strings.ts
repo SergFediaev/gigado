@@ -14,7 +14,7 @@ export const STRINGS = {
         VERSION: 'Version:',
         BUILD: 'Build:',
         GITHUB: 'GitHub:',
-        PROJECT_GITHUB: 'github.com/SergFediaev/todolia',
+        PROJECT_GITHUB: 'github.com/SergFediaev/gigado',
         LISTS: 'Lists',
         SHOW_LIST_ID: 'Show list ID:',
         SHOW_LIST_INPUT: 'Show list input:',
@@ -35,7 +35,7 @@ export const PROJECT = {
 } as const
 
 export const LINKS = {
-    PROJECT_GITHUB: 'https://github.com/SergFediaev/todolia',
+    PROJECT_GITHUB: 'https://github.com/SergFediaev/gigado',
 } as const
 
 export const RENDERING = {
