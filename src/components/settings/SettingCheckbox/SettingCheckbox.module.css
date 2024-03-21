@@ -1,0 +1,10 @@
+.settings {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.settings input[type=checkbox] {
+    margin-right: 10px;
+    transform: scale(2);
+}
