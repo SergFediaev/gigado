@@ -28,6 +28,9 @@ export const settingsReducer = (settings: SettingsType, action: SettingsActionTy
         case SETTINGS_ACTIONS.SET_TASKS_RENDERING:
             return {...settings, dev: {...settings.dev, logTasksRender: payload.isEnabled}} as SettingsType
 
+        case SETTINGS_ACTIONS.SET_ANIMATE:
+            return {...settings, dev: {...settings.dev, animate: payload.isEnabled}}
+
         default: {
             if (settings.dev.errors) throw new Error(ERRORS.INVALID_ACTION_TYPE)
             else return settings

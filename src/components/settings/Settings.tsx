@@ -1,8 +1,9 @@
 import {SettingsType} from '../../store/types/settingsTypes'
 import s from './Settings.module.css'
-import React, {useEffect, useReducer, useState} from 'react'
+import React, {memo, useEffect, useReducer, useState} from 'react'
 import {settingsReducer} from '../../store/reducers/settingsReducer'
 import {
+    setAnimate,
     setDevMode,
     setLogMainRender,
     setLogTasksRender,
@@ -23,7 +24,7 @@ type SettingsPropsType = {
     initialSettings: SettingsType
 }
 
-export const Settings = ({initialSettings}: SettingsPropsType) => {
+export const Settings = memo(({initialSettings}: SettingsPropsType) => {
     if (initialSettings.dev.logMainRender) console.log(RENDERING.SETTINGS)
 
     //region Local state.
@@ -60,6 +61,8 @@ export const Settings = ({initialSettings}: SettingsPropsType) => {
     const setLogMainRenderHandler = (isEnabled: boolean) => dispatchSettings(setLogMainRender(isEnabled))
 
     const setLogTasksRenderHandler = (isEnabled: boolean) => dispatchSettings(setLogTasksRender(isEnabled))
+
+    const setAnimateHandler = (isEnabled: boolean) => dispatchSettings(setAnimate(isEnabled))
     //endregion
 
     return <div className={s.settings}>
@@ -116,6 +119,11 @@ export const Settings = ({initialSettings}: SettingsPropsType) => {
                 checked={settings.dev.logTasksRender}
                 onChange={setLogTasksRenderHandler}
             />
+            <SettingCheckbox
+                name={STRINGS.SETTINGS.ANIMATIONS}
+                checked={settings.dev.animate}
+                onChange={setAnimateHandler}
+            />
         </SettingSection>}
     </div>
-}
+})

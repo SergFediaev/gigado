@@ -1,5 +1,5 @@
-import {ChangeEvent} from 'react'
-import S from './Input.module.css'
+import {memo} from 'react'
+import s from './Input.module.css'
 
 type InputPropsType = {
     inputValue: string
@@ -7,18 +7,10 @@ type InputPropsType = {
     placeholder: string
 }
 
-export const Input = ({inputValue, onChangeCallback, placeholder}: InputPropsType) => {
-    const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
-        onChangeCallback(event.currentTarget.value)
-    }
-
-    return <input
-        type="text"
-        value={inputValue}
-        onChange={(event) => {
-            onChangeHandler(event)
-        }}
-        placeholder={placeholder}
-        className={S.input}
-    />
-}
+export const Input = memo(({inputValue, onChangeCallback, placeholder}: InputPropsType) => <input
+    type="text"
+    value={inputValue}
+    onChange={(event) => onChangeCallback(event.currentTarget.value)}
+    placeholder={placeholder}
+    className={s.input}
+/>)

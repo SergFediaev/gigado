@@ -1,4 +1,5 @@
-import S from './ActionButton.module.css'
+import s from './ActionButton.module.css'
+import {memo} from 'react'
 
 type ActionButtonPropsType = {
     name: string
@@ -8,15 +9,13 @@ type ActionButtonPropsType = {
     tooltips?: boolean
 }
 
-export const ActionButton = ({
-                                 name,
-                                 onClickCallback,
-                                 icon,
-                                 important,
-                                 tooltips,
-                             }: ActionButtonPropsType) => {
-    return <button
-        className={`${S.button} ${important && S.important}`}
-        onClick={onClickCallback}
-    >{icon && `${icon} `}{tooltips && name}</button>
-}
+export const ActionButton = memo(({
+                                      name,
+                                      onClickCallback,
+                                      icon,
+                                      important,
+                                      tooltips,
+                                  }: ActionButtonPropsType) => <button
+    className={`${s.button} ${important && s.important}`}
+    onClick={onClickCallback}
+>{icon && `${icon} `}{tooltips && name}</button>)

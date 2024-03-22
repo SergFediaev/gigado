@@ -1,4 +1,5 @@
 import {
+    setAnimate,
     setDevMode,
     setLogMainRender,
     setLogTasksRender,
@@ -16,6 +17,7 @@ export type SettingsActionType =
     | SetShowListIdType
     | SetShowListInputType
     | SetShowListTooltipsType
+    | SetAnimateType
 
 type SetShowListIdType = ReturnType<typeof setShowListId>
 
@@ -30,3 +32,5 @@ type SetMarkupType = ReturnType<typeof setMarkup>
 type SetLogMainRenderType = ReturnType<typeof setLogMainRender>
 
 type SetLogTasksRenderType = ReturnType<typeof setLogTasksRender>
+
+type SetAnimateType = ReturnType<typeof setAnimate>

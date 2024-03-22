@@ -17,14 +17,12 @@ export const render = (settings: SettingsType) => {
     if (settings.dev.logMainRender) console.log(RENDERING.INDEX)
 
     return root.render(
-        <React.StrictMode>
-            <HashRouter>
-                <App
-                    initialState={state}
-                    initialSettings={settings}
-                />
-            </HashRouter>
-        </React.StrictMode>,
+        <HashRouter>
+            <App
+                initialState={state}
+                initialSettings={settings}
+            />
+        </HashRouter>,
     )
 }
 

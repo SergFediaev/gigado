@@ -16,4 +16,5 @@ type DevType = {
     logTasksRender: boolean,
     markup: boolean,
     errors: boolean,
+    animate: boolean,
 }

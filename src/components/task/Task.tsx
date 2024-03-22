@@ -1,4 +1,4 @@
-import React, {ChangeEvent, MouseEvent, useState} from 'react'
+import React, {ChangeEvent, memo, MouseEvent, useState} from 'react'
 import s from './Task.module.css'
 import {ActionButton} from '../actionButton/ActionButton'
 import {useAutoAnimate} from '@formkit/auto-animate/react'
@@ -20,31 +20,27 @@ export type TaskPropsType = {
     listsCount: number
 }
 
-export const Task = ({
-                         id,
-                         listId,
-                         name,
-                         changeTaskName,
-                         isDone,
-                         isSelected,
-                         deleteTask,
-                         updateTask,
-                         moveTaskVertical,
-                         moveTaskHorizontal,
-                         tasksCount,
-                         listsCount,
-                     }: TaskPropsType) => {
+export const Task = memo(({
+                              id,
+                              listId,
+                              name,
+                              changeTaskName,
+                              isDone,
+                              isSelected,
+                              deleteTask,
+                              updateTask,
+                              moveTaskVertical,
+                              moveTaskHorizontal,
+                              tasksCount,
+                              listsCount,
+                          }: TaskPropsType) => {
     if (settings.dev.logTasksRender) console.log(RENDERING.TASK_NAME, name)
 
-    const onClickHandler = () => deleteTask(listId, id)
-
-    const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => updateTask(listId, id, event.currentTarget.checked)
-
     const [editing, setEditing] = useState<boolean>(false)
-
     const [selected, setSelected] = useState<boolean>(isSelected)
-
     const [taskNameInput, setTaskNameInput] = useState<string>(name)
+    const [showTooltips, setShowTooltips] = useState(false)
+    const [animate] = useAutoAnimate()
 
     const changeTaskNameHandler = () => {
         if (name !== taskNameInput) changeTaskName(listId, id, taskNameInput)
@@ -56,14 +52,14 @@ export const Task = ({
         else setSelected(!selected)
     }
 
-    const [showTooltips, setShowTooltips] = useState(false)
+    const onClickHandler = () => deleteTask(listId, id)
 
-    const [animateTaskRef] = useAutoAnimate<HTMLElement>()
+    const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => updateTask(listId, id, event.currentTarget.checked)
 
     return <>
         <li
             className={`${s.task} ${selected && s.taskSelected}`}
-            ref={animateTaskRef}
+            ref={settings ? animate : undefined}
         >
             <div className={s.taskContainer}>
                 {editing ? <textarea
@@ -129,4 +125,4 @@ export const Task = ({
             }
         </li>
     </>
-}
+})

@@ -1,4 +1,5 @@
 import s from './InputForm.module.css'
+import {memo} from 'react'
 
 type InputFormPropsType = {
     inputValue: string
@@ -9,14 +10,14 @@ type InputFormPropsType = {
     buttonTitle?: string
 };
 
-export const InputForm = ({
-                              inputValue,
-                              placeholder,
-                              onChange,
-                              buttonIcon,
-                              onClick,
-                              buttonTitle,
-                          }: InputFormPropsType) => <form className={s.form}>
+export const InputForm = memo(({
+                                   inputValue,
+                                   placeholder,
+                                   onChange,
+                                   buttonIcon,
+                                   onClick,
+                                   buttonTitle,
+                               }: InputFormPropsType) => <form className={s.form}>
     <input
         value={inputValue}
         placeholder={placeholder}
@@ -27,4 +28,4 @@ export const InputForm = ({
         onClick={() => onClick()}
         title={buttonTitle}
     >{buttonIcon}</button>
-</form>
+</form>)

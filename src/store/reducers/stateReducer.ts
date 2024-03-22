@@ -116,8 +116,6 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
             const swapTask: TaskType = state.tasks[listId][taskIndex]
             let swapIndex
 
-            debugger
-
             if (moveRight) {
                 swapIndex = listIndex + 1
                 if (swapIndex === state.lists.length) swapIndex = 0

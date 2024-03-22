@@ -15,6 +15,7 @@ const defaultSettings: SettingsType = {
         logTasksRender: false,
         markup: false,
         errors: false,
+        animate: true,
     },
 } as const
 

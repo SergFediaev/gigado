@@ -1,4 +1,4 @@
-import React, {useEffect, useReducer, useState} from 'react'
+import React, {memo, useEffect, useReducer, useState} from 'react'
 import {Button} from '../button/Button'
 import {List} from '../list/List'
 import s from './Dashboard.module.css'
@@ -59,7 +59,7 @@ type DashboardPropsType = {
     initialState: StateType
 }
 
-export const Dashboard = ({initialState}: DashboardPropsType) => {
+export const Dashboard = memo(({initialState}: DashboardPropsType) => {
     if (settings.dev.logMainRender) console.log(RENDERING.DASHBOARD)
 
     //region Local state.
@@ -68,7 +68,7 @@ export const Dashboard = ({initialState}: DashboardPropsType) => {
     const navigate = useNavigate()
     const [inputCounterName, setInputCounterName] = useState<string>(STRINGS.EMPTY)
     const [inputListName, setInputListName] = useState<string>(STRINGS.EMPTY)
-    const [animateRef] = useAutoAnimate<HTMLElement>()
+    const [animate] = useAutoAnimate()
     //endregion
 
     //region Local handlers.
@@ -184,13 +184,13 @@ export const Dashboard = ({initialState}: DashboardPropsType) => {
         </div>}
         <main
             className={s.toDoLists}
-            ref={animateRef}
+            ref={settings.dev.animate ? animate : undefined}
         >
             {listsElements}
         </main>
         <aside
             className={s.controlPanel}
-            ref={animateRef}
+            ref={settings.dev.animate ? animate : undefined}
         >
             <h1
                 className={s.appTitle}
@@ -282,4 +282,4 @@ export const Dashboard = ({initialState}: DashboardPropsType) => {
             </div>
         </aside>
     </>
-}
+})

@@ -48,3 +48,10 @@ export const setLogTasksRender = (isEnabled: boolean) => ({
         isEnabled,
     },
 } as const)
+
+export const setAnimate = (isEnabled: boolean) => ({
+    type: SETTINGS_ACTIONS.SET_ANIMATE,
+    payload: {
+        isEnabled,
+    },
+} as const)

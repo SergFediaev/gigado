@@ -2,8 +2,9 @@ import s from './Error404.module.css'
 import {Button} from '../button/Button'
 import {useNavigate} from 'react-router-dom'
 import {PATHS} from '../../strings/paths'
+import {memo} from 'react'
 
-export const Error404 = () => {
+export const Error404 = memo(() => {
     const navigate = useNavigate()
 
     return <div className={s.error}>
@@ -21,4 +22,4 @@ export const Error404 = () => {
             <Button name="Back to dashboard 📊" onClick={() => navigate(PATHS.DASHBOARD)}/>
         </div>
     </div>
-}
+})

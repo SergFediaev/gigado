@@ -10,6 +10,7 @@ export const STRINGS = {
         SHOW_MARKUP: 'Show markup:',
         LOG_MAIN_RENDER: 'Log main components rendering:',
         LOG_TASKS_RENDER: 'Log tasks rendering:',
+        ANIMATIONS: 'Animations',
         ABOUT: 'About',
         VERSION: 'Version:',
         BUILD: 'Build:',

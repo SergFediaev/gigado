@@ -4,13 +4,13 @@ import {useNavigate, useParams} from 'react-router-dom'
 import {Error404} from '../error404/Error404'
 import {PATHS} from '../../strings/paths'
 import {Button} from '../button/Button'
-import React from 'react'
+import React, {memo} from 'react'
 
 type ViewItemPropsType = {
     initialState: StateType
 }
 
-export const ViewItem = ({initialState}: ViewItemPropsType) => {
+export const ViewItem = memo(({initialState}: ViewItemPropsType) => {
     const navigate = useNavigate()
     const {id} = useParams()
     const list = initialState.lists.find(list => list.id === id)
@@ -24,4 +24,4 @@ export const ViewItem = ({initialState}: ViewItemPropsType) => {
             {(list as ListType).isPinned}
         </div> : <Error404/>}
     </>
-}
+})

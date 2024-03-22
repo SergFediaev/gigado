@@ -3,8 +3,8 @@ import {StateType} from '../../store/types/stateTypes'
 import {Navigate, Route, Routes} from 'react-router-dom'
 import {PATHS} from '../../strings/paths'
 import {Error404} from '../error404/Error404'
-import React, {useState} from 'react'
 import {ViewItem} from '../viewItem/ViewItem'
+import React, {memo, useState} from 'react'
 import s from './App.module.css'
 import {RENDERING, STRINGS} from '../../strings/strings'
 import {Settings} from '../settings/Settings'
@@ -15,7 +15,7 @@ type AppPropsType = {
     initialSettings: SettingsType
 }
 
-export const App = ({initialState, initialSettings}: AppPropsType) => {
+export const App = memo(({initialState, initialSettings}: AppPropsType) => {
     if (initialSettings.dev.logMainRender) console.log(RENDERING.APP)
 
     const [backgroundImage, setBackgroundImage] = useState<string>(STRINGS.RANDOM_BACKGROUND_IMAGE_URL)
@@ -56,4 +56,4 @@ export const App = ({initialState, initialSettings}: AppPropsType) => {
             />
         </Routes>
     </div>
-}
+})
