@@ -68,8 +68,7 @@ export const Dashboard = ({initialState}: DashboardPropsType) => {
     const navigate = useNavigate()
     const [inputCounterName, setInputCounterName] = useState<string>(STRINGS.EMPTY)
     const [inputListName, setInputListName] = useState<string>(STRINGS.EMPTY)
-    const [showMenu, setShowMenu] = useState<boolean>(true)
-    const [animateListsRef] = useAutoAnimate<HTMLElement>()
+    const [animateRef] = useAutoAnimate<HTMLElement>()
     //endregion
 
     //region Local handlers.
@@ -185,11 +184,14 @@ export const Dashboard = ({initialState}: DashboardPropsType) => {
         </div>}
         <main
             className={s.toDoLists}
-            ref={animateListsRef}
+            ref={animateRef}
         >
             {listsElements}
         </main>
-        <aside className={s.controlPanel}>
+        <aside
+            className={s.controlPanel}
+            ref={animateRef}
+        >
             <h1
                 className={s.appTitle}
                 title={PROJECT.TRANSCRIPTION}
@@ -215,10 +217,6 @@ export const Dashboard = ({initialState}: DashboardPropsType) => {
                 onClick={() => setListsSelectionHandler(!isAnyListSelected(state.lists as ListType[]))}
             />}
             <Button name={STRINGS.BUTTONS.SETTINGS} onClick={() => navigate(PATHS.SETTINGS)}/>
-            <Button
-                name={showMenu ? 'Hide statistics' : 'Show statistics'}
-                onClick={() => setShowMenu(!showMenu)}
-            />
             <Button
                 name="Add mocked lists"
                 onClick={addMockedListsHandler}
@@ -248,7 +246,7 @@ export const Dashboard = ({initialState}: DashboardPropsType) => {
                 onClick={deleteAllItemsHandler}
                 important={true}
             />}
-            {showMenu && <div className={s.submenu}>
+            <div className={s.submenu}>
                 <table>
                     <tbody>
                     <tr>
@@ -281,7 +279,7 @@ export const Dashboard = ({initialState}: DashboardPropsType) => {
                     </tr>
                     </tbody>
                 </table>
-            </div>}
+            </div>
         </aside>
     </>
 }
