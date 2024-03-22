@@ -31,8 +31,8 @@ export const PROJECT = {
     LOGOTYPE: 'Gigado📌',
     DESCRIPTION: 'To-do list web app.',
     TRANSCRIPTION: 'Гигаду',
-    VERSION: '0.1 alpha',
-    BUILD: '210324',
+    VERSION: '0.2 alpha',
+    BUILD: '220324',
 } as const
 
 export const LINKS = {

@@ -14,8 +14,15 @@
 
 .section a {
     color: deepskyblue;
+    text-decoration: none;
+    padding-bottom: 4px;
+    border-bottom: 2px solid deepskyblue;
+    transition: .5s linear;
+    display: inline-block;
 }
 
 .section a:hover {
     color: aqua;
+    border-bottom-color: aqua;
+    transform: scale(1.01);
 }
