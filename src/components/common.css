@@ -27,24 +27,6 @@ html {
     color: #000;
 }
 
-h1 {
-    font-size: 4rem;
-    color: transparent;
-    background-image: linear-gradient(125deg, #f00, #ff0, #0f0);
-    background-clip: text;
-    animation: hue 5s infinite linear;
-}
-
 h2 {
     font-size: 1.5rem;
-}
-
-@keyframes hue {
-    from {
-        filter: hue-rotate(0deg);
-    }
-
-    to {
-        filter: hue-rotate(-360deg);
-    }
 }

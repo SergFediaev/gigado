@@ -1,4 +1,7 @@
+import {DashboardItemOptionType} from '../dashboard'
+
 export type SettingsType = {
+    dashboard: DashboardType
     lists: ListsType
     dev: DevType
 }
@@ -17,4 +20,8 @@ type DevType = {
     markup: boolean,
     errors: boolean,
     animate: boolean,
+}
+
+type DashboardType = {
+    selectedItemOption: DashboardItemOptionType
 }

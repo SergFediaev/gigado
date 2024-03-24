@@ -1,6 +1,6 @@
 import {Dashboard} from '../dashboard/Dashboard'
 import {StateType} from '../../store/types/stateTypes'
-import {Navigate, Route, Routes} from 'react-router-dom'
+import {Route, Routes} from 'react-router-dom'
 import {PATHS} from '../../strings/paths'
 import {Error404} from '../error404/Error404'
 import {ViewItem} from '../viewItem/ViewItem'
@@ -9,6 +9,7 @@ import s from './App.module.css'
 import {RENDERING, STRINGS} from '../../strings/strings'
 import {Settings} from '../settings/Settings'
 import {SettingsType} from '../../store/types/settingsTypes'
+import {Login} from '../login/Login'
 
 type AppPropsType = {
     initialState: StateType
@@ -32,7 +33,7 @@ export const App = memo(({initialState, initialSettings}: AppPropsType) => {
             />
             <Route
                 path={PATHS.ROOT}
-                element={<Navigate to={PATHS.DASHBOARD}/>}
+                element={<Login/>}
             />
             <Route
                 path={PATHS.SETTINGS}

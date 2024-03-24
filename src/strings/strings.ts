@@ -3,7 +3,14 @@ export const STRINGS = {
     EMPTY: '',
     BUTTONS: {
         SETTINGS: 'Settings',
+        DASHBOARD: 'Dashboard',
+        LOGOUT: 'Logout',
     },
+    LIST: 'List',
+    COUNTER: 'Counter',
+    NOTE: 'Note',
+    PLAYLIST: 'Playlist',
+    PICTURE: 'Picture',
     SETTINGS: {
         DEV_TITLE: 'Dev',
         DEV_MODE: 'Dev mode:',
@@ -28,11 +35,12 @@ export const STRINGS = {
 
 export const PROJECT = {
     NAME: 'Gigado',
+    TRANSCRIPTION: 'Гигаду',
     LOGOTYPE: 'Gigado📌',
     DESCRIPTION: 'To-do list web app.',
-    TRANSCRIPTION: 'Гигаду',
-    VERSION: '0.2 alpha',
-    BUILD: '220324',
+    SLOGAN: 'Just to-do it!',
+    VERSION: '0.3 alpha',
+    BUILD: '240324',
 } as const
 
 export const LINKS = {
@@ -47,4 +55,19 @@ export const RENDERING = {
     LIST_NAME: 'List rendering: ',
     COUNTER_NAME: 'Counter rendering: ',
     TASK_NAME: 'Task rendering: ',
+} as const
+
+export const EMOJIS = {
+    ARROW_UP: '▲',
+    ARROW_DOWN: '▼',
+    WALL: '🧱',
+    LIST: '📋',
+    COUNTER: '🧮',
+    NOTE: '📝',
+    PLAYLIST: '🎶',
+    PICTURE: '🖼️',
+} as const
+
+export const TITLES = {
+    YOUTUBE_BACKGROUND: 'YouTube video background',
 } as const

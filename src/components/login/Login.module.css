@@ -1,0 +1,88 @@
+.login {
+    height: 100vh;
+    width: 100vw;
+}
+
+.login iframe {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 100vh;
+    transform: translate(-50%, -50%);
+}
+
+@media (min-aspect-ratio: 16/9) {
+    .login iframe {
+        /* height = 100 * (9 / 16) = 56.25 */
+        height: 56.25vw;
+    }
+}
+
+@media (max-aspect-ratio: 16/9) {
+    .login iframe {
+        /* width = 100 / (9 / 16) = 177.777777 */
+        width: 177.78vh;
+    }
+}
+
+.logo {
+    background-color: rgba(0, 0, 0, .9);
+    mix-blend-mode: multiply;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100vw;
+    height: 100vh;
+    transition: 1s linear;
+    padding: 60px;
+}
+
+.logo h1 {
+    line-height: 1;
+    font-size: 20rem;
+    font-weight: 900;
+    word-wrap: anywhere;
+}
+
+.inverse h1 {
+    -webkit-text-stroke: 20px #000;
+}
+
+.inverse p {
+    -webkit-text-stroke: 10px #000;
+}
+
+.inverse {
+    background: transparent;
+}
+
+.logo p {
+    font-weight: 900;
+    font-size: 10rem;
+}
+
+.buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    gap: 60px;
+}
+
+.logo button {
+    font-size: 5rem;
+    background-color: #fff;
+    border-radius: 40px;
+    padding: 15px 40px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: .3s linear;
+}
+
+.logo button:hover {
+    background-color: transparent;
+    color: #fff;
+}
