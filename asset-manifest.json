@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/gigado/static/css/main.d1dc4ac5.css",
-    "main.js": "/gigado/static/js/main.4e2df35a.js",
+    "main.css": "/gigado/static/css/main.fbaf8236.css",
+    "main.js": "/gigado/static/js/main.681ae133.js",
     "static/js/453.323dd9ed.chunk.js": "/gigado/static/js/453.323dd9ed.chunk.js",
     "static/media/onboarding.gif": "/gigado/static/media/onboarding.dcaeadd8e64dd855bf60.gif",
     "static/media/error404.gif": "/gigado/static/media/error404.108f0e367744ceab0709.gif",
     "index.html": "/gigado/index.html",
-    "main.d1dc4ac5.css.map": "/gigado/static/css/main.d1dc4ac5.css.map",
-    "main.4e2df35a.js.map": "/gigado/static/js/main.4e2df35a.js.map",
+    "main.fbaf8236.css.map": "/gigado/static/css/main.fbaf8236.css.map",
+    "main.681ae133.js.map": "/gigado/static/js/main.681ae133.js.map",
     "453.323dd9ed.chunk.js.map": "/gigado/static/js/453.323dd9ed.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d1dc4ac5.css",
-    "static/js/main.4e2df35a.js"
+    "static/css/main.fbaf8236.css",
+    "static/js/main.681ae133.js"
   ]
 }
