@@ -1,11 +1,10 @@
 import {KEYS} from '../strings/keys'
 import {SettingsType} from './types/settingsTypes'
 import {render} from '../index'
-import {STRINGS} from '../strings/strings'
 
 const defaultSettings: SettingsType = {
     dashboard: {
-        selectedItemOption: STRINGS.LIST,
+        showStats: true,
     },
     lists: {
         showId: true,

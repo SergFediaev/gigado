@@ -1,5 +1,12 @@
 import {SETTINGS_ACTIONS} from '../../strings/actions'
 
+export const setShowStats = (isEnabled: boolean) => ({
+    type: SETTINGS_ACTIONS.SET_SHOW_STATS,
+    payload: {
+        isEnabled,
+    },
+} as const)
+
 export const setShowListId = (isEnabled: boolean) => ({
     type: SETTINGS_ACTIONS.SET_SHOW_LIST_ID,
     payload: {

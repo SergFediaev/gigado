@@ -29,6 +29,7 @@ import {
     moveTaskVertical,
     pinList,
     resetAllCounters,
+    selectItemOption,
     selectList,
     setCount,
     setListsSelection,
@@ -48,14 +49,13 @@ import {
     selectedListsCount,
     tasksCount,
 } from '../../store/reducers/stateReducerHelpers'
-import {CounterType, ListType, StateType, TaskType} from '../../store/types/stateTypes'
-import {setLocalStorageState} from '../../store/state'
+import {CounterType, ItemOptionType, ListType, StateType, TaskType} from '../../store/types/stateTypes'
+import {itemOptions, setLocalStorageState} from '../../store/state'
 import {PROJECT, RENDERING, STRINGS} from '../../strings/strings'
 import {useNavigate} from 'react-router-dom'
 import {PATHS} from '../../strings/paths'
 import {Select} from '../select/Select'
 import {settings} from '../../store/settings'
-import {dashboardItemOptions, DashboardItemOptionType} from '../../store/dashboard'
 
 type DashboardPropsType = {
     initialState: StateType
@@ -69,7 +69,6 @@ export const Dashboard = memo(({initialState}: DashboardPropsType) => {
     useEffect(() => setLocalStorageState(state), [state])
     const navigate = useNavigate()
     const [inputName, setInputName] = useState<string>(STRINGS.EMPTY)
-    const [selectedItemOption, setSelectedItemOption] = useState<string>(settings.dashboard.selectedItemOption)
     const [animate] = useAutoAnimate()
     //endregion
 
@@ -77,21 +76,21 @@ export const Dashboard = memo(({initialState}: DashboardPropsType) => {
     const inputChangeHandler = (name: string) => setInputName(name)
 
     const addItemHandler = () => {
-        switch (selectedItemOption as DashboardItemOptionType) {
+        switch (state.selectedItemOption as ItemOptionType) {
             case STRINGS.LIST:
-                addListHandler(undefined, inputName)
+                addListHandler(inputName)
                 break
             case STRINGS.COUNTER :
                 addCounterHandler(inputName)
                 break
             case STRINGS.NOTE:
-                addListHandler(undefined, inputName)
+                addListHandler(inputName)
                 break
             case STRINGS.PICTURE:
-                addListHandler(undefined, inputName)
+                addListHandler(inputName)
                 break
             case STRINGS.PLAYLIST:
-                addListHandler(undefined, inputName)
+                addListHandler(inputName)
                 break
         }
 
@@ -138,8 +137,8 @@ export const Dashboard = memo(({initialState}: DashboardPropsType) => {
 
     const changeListNameHandler = (listId: string, name: string) => dispatchState(changeListName(listId, name))
 
-    const addListHandler = (newTasks?: TaskType[], inputListName?: string) => {
-        dispatchState(addList(newTasks, inputListName))
+    const addListHandler = (inputListName?: string, newTasks?: TaskType[]) => {
+        dispatchState(addList(inputListName, newTasks))
         setInputName(STRINGS.EMPTY)
     }
 
@@ -159,6 +158,8 @@ export const Dashboard = memo(({initialState}: DashboardPropsType) => {
     const setCountHandler = (counterId: string, count: number) => dispatchState(setCount(counterId, count))
 
     const addMockedListsHandler = () => dispatchState(addMockedLists())
+
+    const selectItemOptionHandler = (option: ItemOptionType | string) => dispatchState(selectItemOption(option as ItemOptionType))
     //endregion
 
     //region Elements.
@@ -223,13 +224,13 @@ export const Dashboard = memo(({initialState}: DashboardPropsType) => {
                 inputValue={inputName}
                 onClick={addItemHandler}
                 onChange={inputChangeHandler}
-                placeholder={`${dashboardItemOptions.find(option => option.name === selectedItemOption)?.icon + ' '}Enter ${selectedItemOption.toLowerCase()} name`}
-                buttonTitle={`Create ${selectedItemOption}`}
+                placeholder={`${itemOptions.find(option => option.name === state.selectedItemOption)?.icon + ' '}Enter ${state.selectedItemOption.toLowerCase()} name`}
+                buttonTitle={`Create ${state.selectedItemOption}`}
             />
             <Select
-                selectedOption={selectedItemOption}
-                options={dashboardItemOptions}
-                setSelected={setSelectedItemOption}/>
+                selectedOption={state.selectedItemOption}
+                options={itemOptions}
+                setSelected={selectItemOptionHandler}/>
             {listsCount(state.lists as ListType[]) > 0 && <Button
                 name={isAnyListSelected(state.lists as ListType[]) ? 'Unselect all lists' : 'Select all lists'}
                 onClick={() => setListsSelectionHandler(!isAnyListSelected(state.lists as ListType[]))}
@@ -240,7 +241,7 @@ export const Dashboard = memo(({initialState}: DashboardPropsType) => {
                 onClick={() => navigate(PATHS.ROOT)}
             />
             <Button
-                name="Add mocked lists"
+                name={STRINGS.BUTTONS.DEMO_LISTS}
                 onClick={addMockedListsHandler}
             />
             {countersCount(state.lists as CounterType[]) > 0 && isCountersHaveCount(state.lists) && <Button
@@ -268,7 +269,7 @@ export const Dashboard = memo(({initialState}: DashboardPropsType) => {
                 onClick={deleteAllItemsHandler}
                 important={true}
             />}
-            {settings.lists.showTooltips && <div className={s.submenu}>
+            {settings.dashboard.showStats && <div className={s.submenu}>
                 <table>
                     <tbody>
                     <tr>

@@ -5,6 +5,7 @@ export const STRINGS = {
         SETTINGS: 'Settings',
         DASHBOARD: 'Dashboard',
         LOGOUT: 'Logout',
+        DEMO_LISTS: 'Add demo lists',
     },
     LIST: 'List',
     COUNTER: 'Counter',
@@ -12,6 +13,8 @@ export const STRINGS = {
     PLAYLIST: 'Playlist',
     PICTURE: 'Picture',
     SETTINGS: {
+        DASHBOARD: 'Dashboard',
+        SHOW_STATS: 'Show statistics:',
         DEV_TITLE: 'Dev',
         DEV_MODE: 'Dev mode:',
         SHOW_MARKUP: 'Show markup:',
@@ -29,6 +32,7 @@ export const STRINGS = {
         SHOW_LIST_TOOLTIPS: 'Show list tooltips:',
     },
     NAV: {
+        BACK: 'Back',
         TO_DASHBOARD: 'Back to dashboard 📊',
     },
 } as const
@@ -50,11 +54,15 @@ export const LINKS = {
 export const RENDERING = {
     INDEX: 'Index rendering.',
     APP: 'App rendering.',
+    LOGIN: 'Login rendering.',
     DASHBOARD: 'Dashboard rendering.',
     SETTINGS: 'Settings rendering.',
+    VIEW_ITEM: 'View item rendering.',
     LIST_NAME: 'List rendering: ',
+    VIEW_LIST_NAME: 'View list rendering: ',
     COUNTER_NAME: 'Counter rendering: ',
     TASK_NAME: 'Task rendering: ',
+    VIEW_TASK_NAME: 'View task rendering: ',
 } as const
 
 export const EMOJIS = {

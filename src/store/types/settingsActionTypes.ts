@@ -7,6 +7,7 @@ import {
     setShowListId,
     setShowListInput,
     setShowListTooltips,
+    setShowStats,
 } from '../actions/settingsActions'
 
 export type SettingsActionType =
@@ -18,6 +19,9 @@ export type SettingsActionType =
     | SetShowListInputType
     | SetShowListTooltipsType
     | SetAnimateType
+    | SetShowStatsType
+
+type SetShowStatsType = ReturnType<typeof setShowStats>
 
 type SetShowListIdType = ReturnType<typeof setShowListId>
 

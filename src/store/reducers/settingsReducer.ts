@@ -7,6 +7,9 @@ export const settingsReducer = (settings: SettingsType, action: SettingsActionTy
     const {type, payload} = action
     switch (type) {
 
+        case SETTINGS_ACTIONS.SET_SHOW_STATS:
+            return {...settings, dashboard: {...settings.dashboard, showStats: payload.isEnabled}}
+
         case SETTINGS_ACTIONS.SET_SHOW_LIST_ID:
             return {...settings, lists: {...settings.lists, showId: payload.isEnabled}} as SettingsType
 

@@ -1,0 +1,21 @@
+.taskContainer {
+    display: flex;
+    align-items: baseline;
+    word-wrap: anywhere;
+    gap: 20px;
+}
+
+.task {
+    margin-bottom: 40px;
+}
+
+.taskStatus[type=checkbox] {
+    transform: scale(2);
+    margin-left: 5px;
+}
+
+.doneTask {
+    opacity: .5;
+    color: #f00;
+    text-decoration: line-through;
+}

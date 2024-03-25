@@ -6,4 +6,5 @@ export const PATHS = {
     ID: '/:id',
     ERROR_404: '/error404',
     SETTINGS: '/settings',
+    BACK: -1,
 } as const

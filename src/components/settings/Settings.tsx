@@ -11,6 +11,7 @@ import {
     setShowListId,
     setShowListInput,
     setShowListTooltips,
+    setShowStats,
 } from '../../store/actions/settingsActions'
 import {setLocalStorageSettings} from '../../store/settings'
 import {Button} from '../button/Button'
@@ -32,6 +33,10 @@ export const Settings = memo(({initialSettings}: SettingsPropsType) => {
     const [devModeCount, setDevModeCount] = useState<number>(0)
     useEffect(() => setLocalStorageSettings(settings), [settings])
     const navigate = useNavigate()
+    //endregion
+
+    //region Dashboard handlers.
+    const setShowStatsHandler = (isEnabled: boolean) => dispatchSettings(setShowStats(isEnabled))
     //endregion
 
     //region Lists handlers.
@@ -67,19 +72,13 @@ export const Settings = memo(({initialSettings}: SettingsPropsType) => {
 
     return <div className={s.settings}>
         <Button
-            name={STRINGS.NAV.TO_DASHBOARD}
-            onClick={() => navigate(PATHS.DASHBOARD)}
+            name={STRINGS.NAV.BACK}
+            onClick={() => navigate(PATHS.BACK)}
         />
-        <SettingSection name={STRINGS.SETTINGS.ABOUT}>
-            <h2
-                onClick={enableDevModeHandler}
-                style={settings.dev.mode ? {cursor: 'default'} : {cursor: 'pointer'}}
-            >{PROJECT.NAME}{!settings.dev.mode && devModeCount > 0 &&
-                <sup> (<span style={{color: '#0f0'}}>{devModeCount}</span>/10)</sup>}</h2>
-            <p>{PROJECT.DESCRIPTION}</p>
-            <p>{STRINGS.SETTINGS.VERSION} {PROJECT.VERSION}</p>
-            <p>{STRINGS.SETTINGS.BUILD} {PROJECT.BUILD}</p>
-            <p>{STRINGS.SETTINGS.GITHUB} <a href={LINKS.PROJECT_GITHUB}>{STRINGS.SETTINGS.PROJECT_GITHUB}</a></p>
+        <SettingSection name={STRINGS.SETTINGS.DASHBOARD}>
+            <SettingCheckbox name={STRINGS.SETTINGS.SHOW_STATS}
+                             checked={settings.dashboard.showStats}
+                             onChange={setShowStatsHandler}/>
         </SettingSection>
         <SettingSection name={STRINGS.SETTINGS.LISTS}>
             <SettingCheckbox
@@ -125,5 +124,15 @@ export const Settings = memo(({initialSettings}: SettingsPropsType) => {
                 onChange={setAnimateHandler}
             />
         </SettingSection>}
+        <SettingSection name={STRINGS.SETTINGS.ABOUT}>
+            <h2 onClick={enableDevModeHandler}
+                style={settings.dev.mode ? {cursor: 'default'} : {cursor: 'pointer'}}
+            >{PROJECT.NAME}{!settings.dev.mode && devModeCount > 0 &&
+                <sup> (<span style={{color: '#0f0'}}>{devModeCount}</span>/10)</sup>}</h2>
+            <p>{PROJECT.DESCRIPTION}</p>
+            <p>{STRINGS.SETTINGS.VERSION} {PROJECT.VERSION}</p>
+            <p>{STRINGS.SETTINGS.BUILD} {PROJECT.BUILD}</p>
+            <p>{STRINGS.SETTINGS.GITHUB} <a href={LINKS.PROJECT_GITHUB}>{STRINGS.SETTINGS.PROJECT_GITHUB}</a></p>
+        </SettingSection>
     </div>
 })

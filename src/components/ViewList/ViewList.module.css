@@ -1,0 +1,41 @@
+.toDoList {
+    display: flex;
+    flex-direction: column;
+    background-color: #faf900;
+    max-width: 300px;
+    padding: 20px;
+    border-radius: 20px;
+    gap: 20px;
+    transition: .5s linear;
+    box-shadow: -5px 5px 5px 1px rgba(0, 0, 0, .5);
+}
+
+.completedToDoList {
+    background-color: rgba(173, 255, 47, .9);
+    backdrop-filter: blur(10px);
+}
+
+.completedToDoListName {
+    color: #f00;
+    text-decoration: line-through;
+}
+
+.pinnedToDoList {
+    background-color: #ffce72;
+}
+
+.listTitle {
+    word-wrap: anywhere;
+}
+
+.listId {
+    font-family: Consolas, monospace;
+    font-size: .6rem;
+    opacity: .8;
+}
+
+.tasks {
+    display: flex;
+    flex-direction: column;
+    margin: 40px 0;
+}

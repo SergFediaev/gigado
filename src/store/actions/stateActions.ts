@@ -1,4 +1,4 @@
-import {TaskType} from '../types/stateTypes'
+import {ItemOptionType, TaskType} from '../types/stateTypes'
 import {ACTIONS} from '../../strings/actions'
 
 export const deleteList = (listId: string) => ({
@@ -106,11 +106,11 @@ export const changeListName = (listId: string, name: string) => ({
     },
 } as const)
 
-export const addList = (newTasks?: TaskType[], inputListName?: string) => ({
+export const addList = (inputListName?: string, newTasks?: TaskType[]) => ({
     type: ACTIONS.ADD_LIST,
     payload: {
-        newTasks,
         inputListName,
+        newTasks,
     },
 } as const)
 
@@ -189,4 +189,11 @@ export const resetAllCounters = () => ({
 export const addMockedLists = () => ({
     type: ACTIONS.ADD_MOCKED_LISTS,
     payload: {},
+} as const)
+
+export const selectItemOption = (option: ItemOptionType) => ({
+    type: ACTIONS.SELECT_ITEM_OPTION,
+    payload: {
+        option,
+    },
 } as const)

@@ -2,16 +2,18 @@ import s from './Login.module.css'
 import {useNavigate} from 'react-router-dom'
 import {PATHS} from '../../strings/paths'
 import {memo, useState} from 'react'
-import {PROJECT, STRINGS, TITLES} from '../../strings/strings'
+import {PROJECT, RENDERING, STRINGS, TITLES} from '../../strings/strings'
+import {settings} from '../../store/settings'
 
 export const Login = memo(() => {
+    if (settings.dev.logMainRender) console.log(RENDERING.LOGIN)
+
     const navigate = useNavigate()
     const [invertBackground, setInvertBackground] = useState(false)
-    const mute = 1
 
     return <div className={s.login}>
         <iframe title={TITLES.YOUTUBE_BACKGROUND}
-                src={`https://www.youtube.com/embed/78GOZ1PMp7k?controls=0&autoplay=1&mute=${mute}&playsinline=1&loop=1&playlist=78GOZ1PMp7k&amp;start=30`}
+                src={`https://www.youtube.com/embed/78GOZ1PMp7k?controls=0&autoplay=1&mute=1&playsinline=1&loop=1&playlist=78GOZ1PMp7k&amp;start=30`}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
                 allowFullScreen></iframe>

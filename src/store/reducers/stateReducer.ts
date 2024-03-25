@@ -411,7 +411,7 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
             } as StateType
 
         case ACTIONS.DELETE_ALL_ITEMS:
-            return {lists: [], tasks: {}} as StateType
+            return {...state, lists: [], tasks: {}} as StateType
 
         case ACTIONS.DELETE_ALL_LISTS:
             return {...state, lists: state.lists.filter(list => !isListType(list))} as StateType
@@ -469,6 +469,9 @@ export const stateReducer = (state: StateType, action: StateActionType): StateTy
                 tasks: {...state.tasks, ...mockedData.tasks},
             } as StateType
         }
+
+        case ACTIONS.SELECT_ITEM_OPTION:
+            return {...state, selectedItemOption: payload.option} as StateType
 
         default: {
             if (settings.dev.errors) throw new Error(ERRORS.INVALID_ACTION_TYPE)

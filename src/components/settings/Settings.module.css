@@ -1,6 +1,8 @@
 .settings {
+    height: 100vh;
     padding: 60px;
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
     gap: 40px;
 }

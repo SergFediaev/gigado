@@ -1,6 +1,9 @@
+import {STRINGS} from '../../strings/strings'
+
 export type StateType = {
     lists: ItemType[]
     tasks: TasksType
+    selectedItemOption: ItemOptionType
 }
 
 export type ItemType = ListType | CounterType
@@ -33,3 +36,10 @@ export type TaskType = {
     isSelected: boolean
     isDone: boolean
 }
+
+export type ItemOptionType =
+    typeof STRINGS.LIST
+    | typeof STRINGS.COUNTER
+    | typeof STRINGS.NOTE
+    | typeof STRINGS.PICTURE
+    | typeof STRINGS.PLAYLIST

@@ -21,6 +21,7 @@ import {
     moveTaskVertical,
     pinList,
     resetAllCounters,
+    selectItemOption,
     selectList,
     setCount,
     setListsSelection,
@@ -56,6 +57,7 @@ export type StateActionType =
     | ClearSelectedListsType
     | ResetAllCountersType
     | AddMockedListsType
+    | SelectItemOptionType
 
 type DeleteListType = ReturnType<typeof deleteList>
 
@@ -110,3 +112,5 @@ type ClearSelectedListsType = ReturnType<typeof clearSelectedLists>
 type ResetAllCountersType = ReturnType<typeof resetAllCounters>
 
 type AddMockedListsType = ReturnType<typeof addMockedLists>
+
+type SelectItemOptionType = ReturnType<typeof selectItemOption>
