@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/gigado/static/css/main.1401d6be.css",
-    "main.js": "/gigado/static/js/main.5b40f70b.js",
+    "main.js": "/gigado/static/js/main.9558d728.js",
     "static/js/453.323dd9ed.chunk.js": "/gigado/static/js/453.323dd9ed.chunk.js",
     "static/media/onboarding.gif": "/gigado/static/media/onboarding.dcaeadd8e64dd855bf60.gif",
     "static/media/error404.gif": "/gigado/static/media/error404.108f0e367744ceab0709.gif",
     "index.html": "/gigado/index.html",
     "main.1401d6be.css.map": "/gigado/static/css/main.1401d6be.css.map",
-    "main.5b40f70b.js.map": "/gigado/static/js/main.5b40f70b.js.map",
+    "main.9558d728.js.map": "/gigado/static/js/main.9558d728.js.map",
     "453.323dd9ed.chunk.js.map": "/gigado/static/js/453.323dd9ed.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.1401d6be.css",
-    "static/js/main.5b40f70b.js"
+    "static/js/main.9558d728.js"
   ]
 }
