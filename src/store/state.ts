@@ -30,16 +30,16 @@ export const itemOptions: OptionType[] = [
     {
         icon: EMOJIS.NOTE,
         name: STRINGS.NOTE,
-        disabled: true,
+        // disabled: true,
     },
     {
         icon: EMOJIS.PICTURE,
         name: STRINGS.PICTURE,
-        disabled: true,
+        // disabled: true,
     },
     {
         icon: EMOJIS.PLAYLIST,
         name: STRINGS.PLAYLIST,
-        disabled: true,
+        // disabled: true,
     },
 ]

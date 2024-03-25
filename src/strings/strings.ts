@@ -43,8 +43,8 @@ export const PROJECT = {
     LOGOTYPE: 'Gigado📌',
     DESCRIPTION: 'To-do list web app.',
     SLOGAN: 'Just to-do it!',
-    VERSION: '0.3 alpha',
-    BUILD: '240324',
+    VERSION: '0.4 alpha',
+    BUILD: '250324',
 } as const
 
 export const LINKS = {
