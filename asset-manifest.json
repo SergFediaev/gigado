@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/gigado/static/css/main.daa73972.css",
-    "main.js": "/gigado/static/js/main.a9ce2d34.js",
+    "main.css": "/gigado/static/css/main.69561ee1.css",
+    "main.js": "/gigado/static/js/main.7b4968b5.js",
     "static/js/453.323dd9ed.chunk.js": "/gigado/static/js/453.323dd9ed.chunk.js",
     "static/media/onboarding.mp4": "/gigado/static/media/onboarding.86b8197e935a50c1c292.mp4",
     "static/media/lift.mp4": "/gigado/static/media/lift.fc05aa0e2b1591a43d12.mp4",
@@ -14,12 +14,12 @@
     "static/media/ocean.mp4": "/gigado/static/media/ocean.3154534c371edb10739b.mp4",
     "static/media/wallpaper1.jpg": "/gigado/static/media/wallpaper1.42e1383146a5ebdbb1f0.jpg",
     "index.html": "/gigado/index.html",
-    "main.daa73972.css.map": "/gigado/static/css/main.daa73972.css.map",
-    "main.a9ce2d34.js.map": "/gigado/static/js/main.a9ce2d34.js.map",
+    "main.69561ee1.css.map": "/gigado/static/css/main.69561ee1.css.map",
+    "main.7b4968b5.js.map": "/gigado/static/js/main.7b4968b5.js.map",
     "453.323dd9ed.chunk.js.map": "/gigado/static/js/453.323dd9ed.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.daa73972.css",
-    "static/js/main.a9ce2d34.js"
+    "static/css/main.69561ee1.css",
+    "static/js/main.7b4968b5.js"
   ]
 }
