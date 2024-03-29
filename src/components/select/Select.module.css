@@ -29,6 +29,7 @@
     border-radius: 0 0 20px 20px;
     overflow: hidden;
     box-shadow: -10px 10px 10px 1px rgba(0, 0, 0, .7);
+    z-index: 1;
 }
 
 .select li {

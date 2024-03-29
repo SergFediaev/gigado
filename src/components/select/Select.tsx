@@ -113,7 +113,7 @@ export const Select = memo(({
         </div>
         {showMenu && <ul>
             {options.map((option, index) => {
-                const optionIconName = `${option.icon} ${option.name}`
+                const optionName = `${option.icon ? `${option.icon} ` : STRINGS.EMPTY}${option.name}`
 
                 const onOptionClickHandler = () => {
                     setSelected(option.name)
@@ -124,13 +124,13 @@ export const Select = memo(({
                     ? <li
                         key={index}
                         className={s.locked}
-                    >{optionIconName}</li>
+                    >{optionName}</li>
                     : <li
                         key={index}
                         className={select === option ? s.selection : STRINGS.EMPTY}
                         onClick={onOptionClickHandler}
                         onMouseEnter={() => setSelect(option)}
-                    >{optionIconName}</li>
+                    >{optionName}</li>
             })}
         </ul>}
     </div>

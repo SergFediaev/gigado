@@ -1,4 +1,33 @@
 import {SETTINGS_ACTIONS} from '../../strings/actions'
+import {BackgroundOptionType, VideoBackgroundOptionType} from '../types/settingsTypes'
+
+export const setBackground = (background: BackgroundOptionType) => ({
+    type: SETTINGS_ACTIONS.SET_BACKGROUND,
+    payload: {
+        background,
+    },
+} as const)
+
+export const setOverlay = (isEnabled: boolean) => ({
+    type: SETTINGS_ACTIONS.SET_OVERLAY,
+    payload: {
+        isEnabled,
+    },
+} as const)
+
+export const setVideoBackground = (video: VideoBackgroundOptionType) => ({
+    type: SETTINGS_ACTIONS.SET_VIDEO_BACKGROUND,
+    payload: {
+        video,
+    },
+} as const)
+
+export const setBackgroundSound = (isEnabled: boolean) => ({
+    type: SETTINGS_ACTIONS.SET_BACKGROUND_SOUND,
+    payload: {
+        isEnabled,
+    },
+} as const)
 
 export const setShowStats = (isEnabled: boolean) => ({
     type: SETTINGS_ACTIONS.SET_SHOW_STATS,

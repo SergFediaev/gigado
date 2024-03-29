@@ -7,6 +7,18 @@ export const settingsReducer = (settings: SettingsType, action: SettingsActionTy
     const {type, payload} = action
     switch (type) {
 
+        case SETTINGS_ACTIONS.SET_BACKGROUND:
+            return {...settings, app: {...settings.app, background: payload.background}}
+
+        case SETTINGS_ACTIONS.SET_OVERLAY:
+            return {...settings, app: {...settings.app, overlay: payload.isEnabled}}
+
+        case SETTINGS_ACTIONS.SET_VIDEO_BACKGROUND:
+            return {...settings, app: {...settings.app, videoBackground: payload.video}}
+
+        case SETTINGS_ACTIONS.SET_BACKGROUND_SOUND:
+            return {...settings, app: {...settings.app, backgroundSound: payload.isEnabled}}
+
         case SETTINGS_ACTIONS.SET_SHOW_STATS:
             return {...settings, dashboard: {...settings.dashboard, showStats: payload.isEnabled}}
 

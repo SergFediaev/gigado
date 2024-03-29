@@ -1,31 +1,3 @@
-.login {
-    height: 100vh;
-    width: 100vw;
-}
-
-.login iframe {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 100vw;
-    height: 100vh;
-    transform: translate(-50%, -50%);
-}
-
-@media (min-aspect-ratio: 16/9) {
-    .login iframe {
-        /* height = 100 * (9 / 16) = 56.25 */
-        height: 56.25vw;
-    }
-}
-
-@media (max-aspect-ratio: 16/9) {
-    .login iframe {
-        /* width = 100 / (9 / 16) = 177.777777 */
-        width: 177.78vh;
-    }
-}
-
 .logo {
     background-color: rgba(0, 0, 0, .8);
     mix-blend-mode: multiply;

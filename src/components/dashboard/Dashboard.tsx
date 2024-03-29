@@ -51,11 +51,13 @@ import {
 } from '../../store/reducers/stateReducerHelpers'
 import {CounterType, ItemOptionType, ListType, StateType, TaskType} from '../../store/types/stateTypes'
 import {itemOptions, setLocalStorageState} from '../../store/state'
-import {PROJECT, RENDERING, STRINGS} from '../../strings/strings'
+import {PROJECT, RENDERING, STRINGS, VIDEO_BACKGROUNDS} from '../../strings/strings'
 import {useNavigate} from 'react-router-dom'
 import {PATHS} from '../../strings/paths'
 import {Select} from '../select/Select'
 import {settings} from '../../store/settings'
+import {Background} from '../Background/Background'
+import {VideoBackground} from '../videoBackground/VideoBackground'
 
 type DashboardPropsType = {
     initialState: StateType
@@ -202,23 +204,19 @@ export const Dashboard = memo(({initialState}: DashboardPropsType) => {
     //endregion
 
     return <>
-        {state.lists.length === 0 && <div className={s.onboarding}>
-            <span>Just create your first to-do list!</span>
-        </div>}
-        <main
-            className={s.toDoLists}
-            ref={settings.dev.animate ? animate : undefined}
-        >
-            {listsElements}
-        </main>
-        <aside
-            className={s.controlPanel}
-            ref={settings.dev.animate ? animate : undefined}
-        >
-            <h1
-                className={s.appTitle}
-                title={PROJECT.TRANSCRIPTION}
-            >{PROJECT.LOGOTYPE}</h1>
+        {state.lists.length === 0 ? <div className={s.onboarding}>
+            <VideoBackground video={VIDEO_BACKGROUNDS.ONBOARDING}
+                             controlSound/>
+            <span>Just create ur 1st to-do list!</span>
+        </div> : <>
+            <Background appSettings={settings.app}/>
+            <main className={s.toDoLists}
+                  ref={settings.dev.animate ? animate : undefined}>{listsElements}</main>
+        </>}
+        <aside className={s.controlPanel}
+               ref={settings.dev.animate ? animate : undefined}>
+            <h1 className={s.appTitle}
+                title={PROJECT.TRANSCRIPTION}>{PROJECT.LOGOTYPE}</h1>
             <InputForm
                 buttonIcon="➕"
                 inputValue={inputName}

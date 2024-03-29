@@ -1,13 +1,17 @@
 import {
     setAnimate,
+    setBackground,
+    setBackgroundSound,
     setDevMode,
     setLogMainRender,
     setLogTasksRender,
     setMarkup,
+    setOverlay,
     setShowListId,
     setShowListInput,
     setShowListTooltips,
     setShowStats,
+    setVideoBackground,
 } from '../actions/settingsActions'
 
 export type SettingsActionType =
@@ -20,6 +24,18 @@ export type SettingsActionType =
     | SetShowListTooltipsType
     | SetAnimateType
     | SetShowStatsType
+    | SetBackgroundType
+    | SetOverlayType
+    | SetBackgroundSoundType
+    | SetVideoBackgroundType
+
+type SetBackgroundType = ReturnType<typeof setBackground>
+
+type SetOverlayType = ReturnType<typeof setOverlay>
+
+type SetBackgroundSoundType = ReturnType<typeof setBackgroundSound>
+
+type SetVideoBackgroundType = ReturnType<typeof setVideoBackground>
 
 type SetShowStatsType = ReturnType<typeof setShowStats>
 

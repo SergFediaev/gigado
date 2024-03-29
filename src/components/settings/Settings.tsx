@@ -1,25 +1,32 @@
-import {SettingsType} from '../../store/types/settingsTypes'
+import {BackgroundOptionType, SettingsType, VideoBackgroundOptionType} from '../../store/types/settingsTypes'
 import s from './Settings.module.css'
 import React, {memo, useEffect, useReducer, useState} from 'react'
 import {settingsReducer} from '../../store/reducers/settingsReducer'
 import {
     setAnimate,
+    setBackground,
+    setBackgroundSound,
     setDevMode,
     setLogMainRender,
     setLogTasksRender,
     setMarkup,
+    setOverlay,
     setShowListId,
     setShowListInput,
     setShowListTooltips,
     setShowStats,
+    setVideoBackground,
 } from '../../store/actions/settingsActions'
-import {setLocalStorageSettings} from '../../store/settings'
+import {backgroundOptions, setLocalStorageSettings, videoBackgroundOptions} from '../../store/settings'
 import {Button} from '../button/Button'
 import {PATHS} from '../../strings/paths'
 import {useNavigate} from 'react-router-dom'
 import {LINKS, PROJECT, RENDERING, STRINGS} from '../../strings/strings'
 import {SettingCheckbox} from './SettingCheckbox/SettingCheckbox'
 import {SettingSection} from './SettingSection/SettingSection'
+import {Select} from '../select/Select'
+import {SettingSelect} from './SettingSelect/SettingSelect'
+import {Background} from '../Background/Background'
 
 type SettingsPropsType = {
     initialSettings: SettingsType
@@ -33,6 +40,16 @@ export const Settings = memo(({initialSettings}: SettingsPropsType) => {
     const [devModeCount, setDevModeCount] = useState<number>(0)
     useEffect(() => setLocalStorageSettings(settings), [settings])
     const navigate = useNavigate()
+    //endregion
+
+    //region App handlers.
+    const setBackgroundHandler = (background: BackgroundOptionType | string) => dispatchSettings(setBackground(background as BackgroundOptionType))
+
+    const setOverlayHandler = (isEnabled: boolean) => dispatchSettings(setOverlay(isEnabled))
+
+    const setVideoBackgroundHandler = (video: VideoBackgroundOptionType | string) => dispatchSettings(setVideoBackground(video as VideoBackgroundOptionType))
+
+    const setBackgroundSoundHandler = (isEnabled: boolean) => dispatchSettings(setBackgroundSound(isEnabled))
     //endregion
 
     //region Dashboard handlers.
@@ -71,10 +88,31 @@ export const Settings = memo(({initialSettings}: SettingsPropsType) => {
     //endregion
 
     return <div className={s.settings}>
+        <Background appSettings={settings.app}/>
         <Button
             name={STRINGS.NAV.BACK}
             onClick={() => navigate(PATHS.BACK)}
         />
+        <SettingSection name={STRINGS.SETTINGS.APP}>
+            <SettingSelect>
+                <p>{STRINGS.SETTINGS.BACKGROUND}</p>
+                <Select selectedOption={settings.app.background}
+                        options={backgroundOptions}
+                        setSelected={setBackgroundHandler}/>
+                {settings.app.background === STRINGS.VIDEO &&
+                    <Select selectedOption={settings.app.videoBackground}
+                            options={videoBackgroundOptions}
+                            setSelected={setVideoBackgroundHandler}/>}
+            </SettingSelect>
+            {settings.app.background !== STRINGS.COLOR &&
+                <SettingCheckbox name={STRINGS.SETTINGS.OVERLAY}
+                                 checked={settings.app.overlay}
+                                 onChange={setOverlayHandler}/>}
+            {settings.app.background === STRINGS.VIDEO &&
+                <SettingCheckbox name={STRINGS.SETTINGS.VIDEO_SOUND}
+                                 checked={settings.app.backgroundSound}
+                                 onChange={setBackgroundSoundHandler}/>}
+        </SettingSection>
         <SettingSection name={STRINGS.SETTINGS.DASHBOARD}>
             <SettingCheckbox name={STRINGS.SETTINGS.SHOW_STATS}
                              checked={settings.dashboard.showStats}

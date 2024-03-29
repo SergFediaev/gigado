@@ -7,12 +7,20 @@ export const STRINGS = {
         LOGOUT: 'Logout',
         DEMO_LISTS: 'Add demo lists',
     },
+    COLOR: 'Color',
+    WALLPAPER: 'Wallpaper',
+    RANDOM_WALLPAPER: 'Random wallpaper',
+    VIDEO: 'Video',
     LIST: 'List',
     COUNTER: 'Counter',
     NOTE: 'Note',
     PLAYLIST: 'Playlist',
     PICTURE: 'Picture',
     SETTINGS: {
+        APP: 'App',
+        BACKGROUND: 'Background:',
+        OVERLAY: 'Overlay:',
+        VIDEO_SOUND: 'Video background sound',
         DASHBOARD: 'Dashboard',
         SHOW_STATS: 'Show statistics:',
         DEV_TITLE: 'Dev',
@@ -37,14 +45,25 @@ export const STRINGS = {
     },
 } as const
 
+export const VIDEO_BACKGROUNDS = {
+    BEACH: 'Beach',
+    OCEAN: 'Ocean',
+    FIREPLACE: 'Fireplace',
+    ANIME1: 'Lift',
+    ANIME2: 'Rain (english dubbed)',
+    ANIME3: 'Rain (russian dubbed)',
+    ANIME4: 'Pain',
+    ONBOARDING: 'Onboarding',
+} as const
+
 export const PROJECT = {
     NAME: 'Gigado',
     TRANSCRIPTION: 'Гигаду',
     LOGOTYPE: 'Gigado📌',
     DESCRIPTION: 'To-do list web app.',
     SLOGAN: 'Just to-do it!',
-    VERSION: '0.4 alpha',
-    BUILD: '250324',
+    VERSION: '0.5 alpha',
+    BUILD: '300324',
 } as const
 
 export const LINKS = {
@@ -74,8 +93,14 @@ export const EMOJIS = {
     NOTE: '📝',
     PLAYLIST: '🎶',
     PICTURE: '🖼️',
+    MUTE: '🔇',
+    UNMUTE: '🔊',
 } as const
 
 export const TITLES = {
     YOUTUBE_BACKGROUND: 'YouTube video background',
+} as const
+
+export const FILE_TYPES = {
+    MP4: 'video/mp4',
 } as const
